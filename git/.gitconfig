@@ -1,0 +1,42 @@
+[user]
+    name = Alexandre Jardin
+
+[includeIf "gitdir:~/Sites/ajardin/"]
+    path = ~/.gitconfig-opensource
+
+[alias]
+    aliases = config --get-regexp alias
+    fp = fetch --all --prune --tags --force
+    last = log --graph --pretty=tformat:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%an %cr)%Creset' -n15
+    oops = commit --amend --no-edit
+    rb = rebase origin/master
+    rbi = "!r() { git rebase -i HEAD~$1; }; r" # Interactive rebase with the given number of latest commits
+    st = status
+
+[color]
+    ui = auto
+
+[commit]
+    gpgsign = true
+
+[core]
+    excludesfile = ~/.gitignore
+    pager = cat
+
+[checkout]
+    defaultRemote = origin
+
+[credential]
+    helper = osxkeychain
+
+[diff]
+    noprefix = true
+
+[help]
+    autocorrect = 10
+
+[pull]
+    rebase = true
+
+[rerere]
+    enabled = true

@@ -1,0 +1,79 @@
+tap "homebrew/bundle"
+tap "homebrew/cask"
+tap "homebrew/cask-versions"
+tap "homebrew/core"
+tap "homebrew/services"
+
+# Bourne-Again SHell, a UNIX command interpreter
+brew "bash"
+# Clone of cat(1) with syntax highlighting and Git integration
+brew "bat"
+# Dependency Manager for PHP
+brew "composer"
+# Get a file from an HTTP, HTTPS or FTP server
+brew "curl"
+# Convert text between DOS, UNIX, and Mac formats
+brew "dos2unix"
+# Monitor a directory for changes and run a shell command
+brew "fswatch"
+# Distributed revision control system
+brew "git"
+# Improved top (interactive process viewer)
+brew "htop"
+# Lightweight and flexible command-line JSON processor
+brew "jq"
+# Utility for directing compilation
+brew "make"
+# Simple tool to make locally trusted development certificates
+brew "mkcert"
+# NCurses Disk Usage
+brew "ncdu"
+# Platform built on V8 to build network applications
+brew "node"
+# General-purpose scripting language
+brew "php"
+# Wrapper to colorize and simplify ping's output
+brew "prettyping"
+# HTTP regression testing and benchmarking utility
+brew "siege"
+# Display directories as trees (with optional color/HTML output)
+brew "tree"
+# Internet file retriever
+brew "wget"
+# JavaScript package manager
+brew "yarn"
+# UNIX shell (command interpreter)
+brew "zsh"
+# Additional completion definitions for zsh
+brew "zsh-completions"
+# Fish shell like syntax highlighting for zsh
+brew "zsh-syntax-highlighting"
+
+# Fast file synchronization and network forwarding for remote development
+tap "mutagen-io/mutagen"
+brew "mutagen-io/mutagen/mutagen-beta"
+
+# Password manager that keeps all passwords secure behind one password
+cask "1password"
+# Text editor
+cask "atom"
+# Web browser focusing on privacy
+cask "brave-browser"
+# App to build and share containerized applications and microservices
+cask "docker"
+# Reimagine your terminal
+cask "fig"
+# Tools to protect your emails and files
+cask "gpg-suite"
+# Tool to optimize images to a smaller size
+cask "imageoptim"
+# Terminal emulator as alternative to Apple's Terminal app
+cask "iterm2"
+# JetBrains tools manager
+cask "jetbrains-toolbox"
+# App to write, plan, collaborate, and get organized
+cask "notion"
+# Team communication and collaboration software
+cask "slack"
+# Music streaming service
+cask "spotify"
