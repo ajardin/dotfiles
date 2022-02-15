@@ -12,3 +12,6 @@ brew update
 # Install Homebrew packages
 directory_path=$(realpath "$(dirname "${BASH_SOURCE[0]}")")
 brew bundle install --file="${directory_path}/Brewfile" --verbose
+
+# Install Oh My Zsh
+sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
