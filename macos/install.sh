@@ -3,6 +3,9 @@
 # Install command line tools without Xcode
 xcode-select --install
 
+# Install Rosetta 2
+softwareupdate --install-rosetta
+
 # Install Homebrew if not already installed
 command -v brew > /dev/null || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
