@@ -11,6 +11,8 @@ brew "bash"
 brew "bat"
 # Dependency Manager for PHP
 brew "composer"
+# GNU File, Shell, and Text utilities
+brew "coreutils"
 # Get a file from an HTTP, HTTPS or FTP server
 brew "curl"
 # Convert text between DOS, UNIX, and Mac formats
@@ -53,6 +55,7 @@ brew "zsh-syntax-highlighting"
 # Fast file synchronization and network forwarding for remote development
 tap "mutagen-io/mutagen"
 brew "mutagen-io/mutagen/mutagen-beta"
+brew "mutagen-io/mutagen/mutagen-compose-beta"
 
 # Password manager that keeps all passwords secure behind one password
 cask "1password"
@@ -76,6 +79,8 @@ cask "font-jetbrains-mono"
 cask "jetbrains-toolbox"
 # App to write, plan, collaborate, and get organized
 cask "notion"
+# Collaboration platform for API development
+cask "postman"
 # Team communication and collaboration software
 cask "slack"
 # Music streaming service
