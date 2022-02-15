@@ -1,2 +1,5 @@
 [user]
     email = info@ajardin.fr
+
+[commit]
+    gpgsign = true
