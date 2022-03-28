@@ -7,7 +7,7 @@ osascript -e 'tell application "System Preferences" to quit'
 sudo -v
 
 # Trigger the initialization scripts
-directory_path=$(realpath "$(dirname "${BASH_SOURCE[0]}")")
+directory_path="$(dirname "${BASH_SOURCE[0]}")"
 bash "${directory_path}/configure_core.sh"
 bash "${directory_path}/configure_dock.sh"
 bash "${directory_path}/configure_finder.sh"

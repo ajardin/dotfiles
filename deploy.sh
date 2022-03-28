@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Ensure Homebrew is in PATH
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
 directory_path=$(realpath "$(dirname "${BASH_SOURCE[0]}")")
 
 # Install the Git configuration files

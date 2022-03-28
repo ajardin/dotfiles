@@ -8,13 +8,15 @@ softwareupdate --install-rosetta
 
 # Install Homebrew if not already installed
 command -v brew > /dev/null || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-eval $(/opt/homebrew/bin/brew shellenv)
+
+# Ensure Homebrew is in PATH
+eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Fetch the newest version of Homebrew and all formulae
 brew update
 
 # Install Homebrew packages
-directory_path=$(realpath "$(dirname "${BASH_SOURCE[0]}")")
+directory_path="$(dirname "${BASH_SOURCE[0]}")"
 brew bundle install --file="${directory_path}/Brewfile" --verbose
 
 # Install Oh My Zsh
