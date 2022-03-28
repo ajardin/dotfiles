@@ -9,4 +9,4 @@ export HOMEBREW_GITHUB_API_TOKEN=""
 
 export PATH="/usr/local/opt/curl/bin:${PATH}"
 export PATH="${HOME}/.composer/vendor/bin:${PATH}"
-export PATH="${HOME}/.bin"
+export PATH="${HOME}/.bin:${PATH}"
