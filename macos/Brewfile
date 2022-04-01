@@ -58,7 +58,8 @@ brew "mutagen-io/mutagen/mutagen-beta"
 brew "mutagen-io/mutagen/mutagen-compose-beta"
 
 # Password manager that keeps all passwords secure behind one password
-cask "1password"
+cask "1password-beta"
+cask "1password-cli"
 # Text editor
 cask "atom"
 # Web browser focusing on privacy
