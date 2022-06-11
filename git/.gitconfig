@@ -21,7 +21,7 @@
 
 [core]
     excludesfile = ~/.gitignore
-    pager = cat
+    pager = delta
 
 [checkout]
     defaultRemote = origin
@@ -29,11 +29,21 @@
 [credential]
     helper = osxkeychain
 
+[delta]
+    navigate = true  # use n and N to move between diff sections
+    light = false    # set to true if you're in a terminal w/ a light background color (e.g. the default macOS terminal)
+
 [diff]
-    noprefix = true
+    colorMoved = default
+
+[interactive]
+    diffFilter = delta --color-only
 
 [help]
     autocorrect = 10
+
+[merge]
+    conflictstyle = diff3
 
 [pull]
     rebase = true
