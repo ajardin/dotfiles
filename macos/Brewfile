@@ -68,20 +68,24 @@ cask "brave-browser"
 cask "docker"
 # Reimagine your terminal
 cask "fig"
+# A typeface made for developers by JetBrains
+cask "font-jetbrains-mono"
 # Tools to protect your emails and files
 cask "gpg-suite"
 # Tool to optimize images to a smaller size
 cask "imageoptim"
 # Terminal emulator as alternative to Apple's Terminal app
 cask "iterm2"
-# A typeface made for developers by JetBrains
-cask "font-jetbrains-mono"
+# Keyboard customizer
+cask "karabiner-elements"
 # JetBrains tools manager
 cask "jetbrains-toolbox"
 # App to write, plan, collaborate, and get organized
 cask "notion"
 # Collaboration platform for API development
 cask "postman"
+# Control your tools with a few keystrokes
+cask "raycast"
 # Team communication and collaboration software
 cask "slack"
 # Music streaming service
