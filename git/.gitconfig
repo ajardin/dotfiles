@@ -1,11 +1,11 @@
 [user]
     name = Alexandre Jardin
 
-[includeIf "gitdir:~/Sites/ajardin/"]
-    path = ~/.gitconfig-opensource
+[include]
+    path = .gitconfig-corporate
 
-[includeIf "gitdir:~/Sites/convelio/"]
-    path = ~/.gitconfig-convelio
+[includeIf "gitdir:~/Sites/ajardin/"]
+    path = .gitconfig-opensource
 
 [alias]
     aliases = config --get-regexp alias

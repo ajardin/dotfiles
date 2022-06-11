@@ -44,4 +44,4 @@ for view in 'FK_Standard' 'Standard'; do
     /usr/libexec/PlistBuddy -c "Set :${view}ViewSettings:ListViewSettings:sortColumn name" ~/Library/Preferences/com.apple.finder.plist
 done
 
-killall Finder
+killall -9 Finder

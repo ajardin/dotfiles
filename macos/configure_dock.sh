@@ -27,4 +27,4 @@ defaults write com.apple.dock show-process-indicators -bool true
 # System Preferences > Dock > Show recent applications in Dock
 defaults write com.apple.dock show-recents -bool false
 
-killall Dock
+killall -9 Dock
