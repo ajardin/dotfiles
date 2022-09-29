@@ -45,8 +45,15 @@
 [merge]
     conflictstyle = diff3
 
+[push]
+    default = current
+    autoSetupRemote = true
+
 [pull]
     rebase = true
 
 [rerere]
     enabled = true
+
+[init]
+    defaultBranch = main
