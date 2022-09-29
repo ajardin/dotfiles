@@ -4,6 +4,10 @@ alias ll='ls -Glha'
 alias mypath='echo -e ${PATH//:/\\n} | sort --unique'
 alias ping='prettyping --nolegend'
 
+manpdf() {
+    man -t $@ | open -f -a Preview
+}
+
 self-upgrade() {
     softwareupdate --install --all && \
     brew update && brew upgrade && brew autoremove && brew cleanup && \
