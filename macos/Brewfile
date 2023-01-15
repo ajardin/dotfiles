@@ -76,8 +76,6 @@ cask "gpg-suite"
 cask "imageoptim"
 # Terminal emulator as alternative to Apple's Terminal app
 cask "iterm2"
-# Keyboard customizer
-cask "karabiner-elements"
 # JetBrains tools manager
 cask "jetbrains-toolbox"
 # App to write, plan, collaborate, and get organized
