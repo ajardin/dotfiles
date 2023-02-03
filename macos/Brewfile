@@ -29,6 +29,8 @@ brew "jq"
 brew "make"
 # Simple tool to make locally trusted development certificates
 brew "mkcert"
+# Fast file synchronization and network forwarding for remote development
+brew "mutagen-io/mutagen/mutagen"
 # NCurses Disk Usage
 brew "ncdu"
 # Platform built on V8 to build network applications
@@ -52,18 +54,15 @@ brew "zsh-completions"
 # Fish shell like syntax highlighting for zsh
 brew "zsh-syntax-highlighting"
 
-# Fast file synchronization and network forwarding for remote development
-tap "mutagen-io/mutagen"
-brew "mutagen-io/mutagen/mutagen-beta"
-brew "mutagen-io/mutagen/mutagen-compose-beta"
-
 # Password manager that keeps all passwords secure behind one password
-cask "1password-beta"
+cask "1password"
 cask "1password-cli"
 # Text editor
 cask "atom"
 # Web browser focusing on privacy
 cask "brave-browser"
+# Voice and text chat software
+cask "discord"
 # App to build and share containerized applications and microservices
 cask "docker"
 # Reimagine your terminal

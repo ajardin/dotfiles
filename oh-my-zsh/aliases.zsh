@@ -11,6 +11,7 @@ manpdf() {
 self-upgrade() {
     softwareupdate --install --all && \
     brew update && brew upgrade && brew autoremove && brew cleanup && \
+    mutagen daemon stop && mutagen daemon start && \
     omz update && \
     composer global update --optimize-autoloader --classmap-authoritative && \
     yarn global upgrade

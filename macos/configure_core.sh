@@ -36,3 +36,6 @@ defaults write com.apple.NetworkBrowser BrowseAllInterfaces -bool true
 
 # Automatically quit printer app once the print jobs complete
 defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
+
+# Disable the crash reporter
+defaults write com.apple.CrashReporter DialogType -string "none"
