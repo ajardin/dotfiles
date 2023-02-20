@@ -1,5 +1,3 @@
-DEFAULT_USER="aja"
-
 ZSH_THEME_GIT_PROMPT_PREFIX=" %{$fg_bold[white]%}on%{$fg_bold[yellow]%} "
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$fg_bold[yellow]%}%{$reset_color%}"
 
