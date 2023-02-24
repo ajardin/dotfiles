@@ -5,6 +5,8 @@ tap "homebrew/cask-versions"
 tap "homebrew/core"
 tap "homebrew/services"
 
+# Official Amazon AWS command-line interface
+brew "awscli"
 # Bourne-Again SHell, a UNIX command interpreter
 brew "bash"
 # Clone of cat(1) with syntax highlighting and Git integration
@@ -35,6 +37,10 @@ brew "mutagen-io/mutagen/mutagen"
 brew "ncdu"
 # Platform built on V8 to build network applications
 brew "node"
+# SSL/TLS VPN implementing OSI layer 2 or 3 secure network extension
+brew "openvpn"
+# Execute binaries from Python packages in isolated environments
+brew "pipx"
 # General-purpose scripting language
 brew "php"
 # Wrapper to colorize and simplify ping's output
@@ -57,10 +63,12 @@ brew "zsh-syntax-highlighting"
 # Password manager that keeps all passwords secure behind one password
 cask "1password"
 cask "1password-cli"
-# Text editor
-cask "atom"
+# Managed client-based VPN service to securely access AWS resources
+cask "aws-vpn-client"
 # Web browser focusing on privacy
 cask "brave-browser"
+# Two-panel file manager
+cask "commander-one"
 # Voice and text chat software
 cask "discord"
 # App to build and share containerized applications and microservices
@@ -87,3 +95,5 @@ cask "raycast"
 cask "slack"
 # Music streaming service
 cask "spotify"
+# Open-source code editor
+cask "visual-studio-code"
