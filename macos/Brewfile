@@ -23,6 +23,8 @@ brew "dos2unix"
 brew "fswatch"
 # Distributed revision control system
 brew "git"
+# GNU implementation of the famous stream editor
+brew "gnu-sed"
 # Improved top (interactive process viewer)
 brew "htop"
 # Lightweight and flexible command-line JSON processor
@@ -31,9 +33,6 @@ brew "jq"
 brew "make"
 # Simple tool to make locally trusted development certificates
 brew "mkcert"
-# Fast file synchronization and network forwarding for remote development
-brew "mutagen-io/mutagen/mutagen"
-brew "mutagen-io/mutagen/mutagen-compose"
 # NCurses Disk Usage
 brew "ncdu"
 # Platform built on V8 to build network applications
@@ -68,8 +67,6 @@ cask "aws-vpn-client"
 cask "brave-browser"
 # Voice and text chat software
 cask "discord"
-# App to build and share containerized applications and microservices
-cask "docker"
 # Reimagine your terminal
 cask "fig"
 # A typeface made for developers by JetBrains
@@ -86,15 +83,13 @@ cask "jetbrains-toolbox"
 cask "notion"
 # OpenVPN Connect client
 cask "openvpn-connect"
+# Replacement for Docker Desktop
+cask "orbstack"
 # Collaboration platform for API development
 cask "postman"
-# Control your tools with a few keystrokes
-cask "raycast"
 # Team communication and collaboration software
 cask "slack"
 # Music streaming service
 cask "spotify"
 # File transfer application
 cask "transmit"
-# Open-source code editor
-cask "visual-studio-code"

@@ -4,6 +4,8 @@ alias ll='ls -Glha'
 alias mypath='echo -e ${PATH//:/\\n} | sort --unique'
 alias ping='prettyping --nolegend'
 
+alias sed='/opt/homebrew/bin/gsed'
+
 manpdf() {
     man -t $@ | open -f -a Preview
 }
