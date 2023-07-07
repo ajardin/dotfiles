@@ -19,7 +19,7 @@ homebrew: ## Installs Homebrew and the latest version of its packages
 	export HOMEBREW_REPOSITORY="" && \
 	eval "$$(/opt/homebrew/bin/brew shellenv)" && \
 	brew update && \
-	brew bundle install --file="${makefile_directory}/macos/Brewfile" --verbose
+	brew bundle install --file="${makefile_directory}/homebrew/Brewfile" --verbose
 .PHONY: homebrew
 
 macos: ## Installs all required software and some tweaks for macOS
@@ -28,17 +28,23 @@ macos: ## Installs all required software and some tweaks for macOS
 	bash "${makefile_directory}/macos/configure.sh"
 .PHONY: macos
 
-ohmyzsh: ## Installs Oh My Zsh if needed and deploys its configuration files
-	test -d "${HOME}/.oh-my-zsh" || sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-	mkdir -p "${HOME}/.oh-my-zsh/custom"
-	ln -sf "${makefile_directory}/oh-my-zsh/aliases.zsh" "${HOME}/.oh-my-zsh/custom/aliases.zsh"
-	ln -sf "${makefile_directory}/oh-my-zsh/theme.zsh" "${HOME}/.oh-my-zsh/custom/theme.zsh"
-	cp -n "${makefile_directory}/oh-my-zsh/variables.zsh" "${HOME}/.oh-my-zsh/custom/variables.zsh" || test -f "${HOME}/.oh-my-zsh/custom/variables.zsh"
-.PHONY: ohmyzsh
-
-zsh: ## Deploys the ZSH configuration file
-	ln -sf "${makefile_directory}/oh-my-zsh/.zshrc" "${HOME}/.zshrc"
-.PHONY: zsh
+terminal: ## Deploys the configuration of the terminal
+	# Fish
+	mkdir -p "${HOME}/.config/fish"
+	ln -sf "${makefile_directory}/terminal/fish/config.fish" "${HOME}/.config/fish/config.fish"
+	mkdir -p "${HOME}/.config/fish/functions"
+	ln -sf "${makefile_directory}/terminal/fish/functions/du.fish" "${HOME}/.config/fish/functions/du.fish"
+	ln -sf "${makefile_directory}/terminal/fish/functions/ip.fish" "${HOME}/.config/fish/functions/ip.fish"
+	ln -sf "${makefile_directory}/terminal/fish/functions/ll.fish" "${HOME}/.config/fish/functions/ll.fish"
+	ln -sf "${makefile_directory}/terminal/fish/functions/ping.fish" "${HOME}/.config/fish/functions/ping.fish"
+	ln -sf "${makefile_directory}/terminal/fish/functions/sed.fish" "${HOME}/.config/fish/functions/sed.fish"
+	ln -sf "${makefile_directory}/terminal/fish/functions/self-upgrade.fish" "${HOME}/.config/fish/functions/self-upgrade.fish"
+	# Warp
+	mkdir -p "${HOME}/.warp/themes"
+	ln -sf "${makefile_directory}/terminal/warp/themes/tokyo_night.yaml" "${HOME}/.warp/themes/tokyo_night.yaml"
+	# Starship
+	ln -sf "${makefile_directory}/terminal/starship.toml" "${HOME}/.config/starship.toml"
+.PHONY: terminal
 
 help:
 	@grep -E '(^[a-zA-Z_-]+:.*?##.*$$)|(^##)' $(MAKEFILE_LIST) \

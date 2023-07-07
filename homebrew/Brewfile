@@ -19,6 +19,8 @@ brew "coreutils"
 brew "curl"
 # Convert text between DOS, UNIX, and Mac formats
 brew "dos2unix"
+# User-friendly command-line shell for UNIX-like operating systems
+brew "fish"
 # Monitor a directory for changes and run a shell command
 brew "fswatch"
 # Distributed revision control system
@@ -45,18 +47,14 @@ brew "php"
 brew "prettyping"
 # HTTP regression testing and benchmarking utility
 brew "siege"
+# Cross-shell prompt for astronauts
+brew "starship"
 # Display directories as trees (with optional color/HTML output)
 brew "tree"
 # Internet file retriever
 brew "wget"
 # JavaScript package manager
 brew "yarn"
-# UNIX shell (command interpreter)
-brew "zsh"
-# Additional completion definitions for zsh
-brew "zsh-completions"
-# Fish shell like syntax highlighting for zsh
-brew "zsh-syntax-highlighting"
 
 # Password manager that keeps all passwords secure behind one password
 cask "1password"
@@ -67,16 +65,12 @@ cask "aws-vpn-client"
 cask "brave-browser"
 # Voice and text chat software
 cask "discord"
-# Reimagine your terminal
-cask "fig"
 # A typeface made for developers by JetBrains
 cask "font-jetbrains-mono"
 # Tools to protect your emails and files
 cask "gpg-suite"
 # Tool to optimize images to a smaller size
 cask "imageoptim"
-# Terminal emulator as alternative to Apple's Terminal app
-cask "iterm2"
 # JetBrains tools manager
 cask "jetbrains-toolbox"
 # App to write, plan, collaborate, and get organized
@@ -93,3 +87,5 @@ cask "slack"
 cask "spotify"
 # File transfer application
 cask "transmit"
+# Rust-based terminal
+cask "warp"
