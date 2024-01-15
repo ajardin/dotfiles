@@ -11,6 +11,9 @@ set --export LC_CTYPE "UTF-8"
 set --export COMPOSE_HTTP_TIMEOUT 3600
 set --export COMPOSER_MEMORY_LIMIT -1
 
+# AWS environment variables
+set --export --global AWS_REGION "eu-west-1"
+
 # PATH customization
 eval (/opt/homebrew/bin/brew shellenv)
 fish_add_path --prepend "$HOME/.local/bin"
