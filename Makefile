@@ -39,6 +39,7 @@ terminal: ## Deploys the configuration of the terminal
 	ln -sf "${makefile_directory}/terminal/fish/functions/ping.fish" "${HOME}/.config/fish/functions/ping.fish"
 	ln -sf "${makefile_directory}/terminal/fish/functions/sed.fish" "${HOME}/.config/fish/functions/sed.fish"
 	ln -sf "${makefile_directory}/terminal/fish/functions/self-upgrade.fish" "${HOME}/.config/fish/functions/self-upgrade.fish"
+	ln -sf "${makefile_directory}/terminal/fish/functions/wipe.fish" "${HOME}/.config/fish/functions/wipe.fish"
 	# Warp
 	mkdir -p "${HOME}/.warp/themes"
 	ln -sf "${makefile_directory}/terminal/warp/themes/tokyo_night.yaml" "${HOME}/.warp/themes/tokyo_night.yaml"
