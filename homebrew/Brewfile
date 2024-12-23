@@ -1,8 +1,6 @@
 tap "homebrew/bundle"
-tap "homebrew/cask"
 tap "homebrew/cask-fonts"
 tap "homebrew/cask-versions"
-tap "homebrew/core"
 tap "homebrew/services"
 
 # Official Amazon AWS command-line interface
@@ -59,8 +57,6 @@ brew "yarn"
 # Password manager that keeps all passwords secure behind one password
 cask "1password"
 cask "1password-cli"
-# Managed client-based VPN service to securely access AWS resources
-cask "aws-vpn-client"
 # Web browser focusing on privacy
 cask "brave-browser"
 # Voice and text chat software
