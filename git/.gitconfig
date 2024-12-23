@@ -13,47 +13,68 @@
     last = log --graph --pretty=tformat:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%an %cr)%Creset' -n15
     oops = commit --amend --no-edit
     rb = rebase origin/master
-    rbi = "!r() { git rebase -i HEAD~$1; }; r" # Interactive rebase with the given number of latest commits
+    rbi = "!r() { git rebase -i HEAD~$1; }; r"
     st = status
+
+[checkout]
+    defaultRemote = origin
 
 [color]
     ui = auto
 
 [core]
+    compression = 9
     excludesfile = ~/.gitignore
-    pager = delta
-
-[checkout]
-    defaultRemote = origin
+    fscache = true
+    fsmonitor = true
+    pager = cat
+    untrackedCache = true
 
 [credential]
     helper = osxkeychain
 
-[delta]
-    navigate = true  # use n and N to move between diff sections
-    light = false    # set to true if you're in a terminal w/ a light background color (e.g. the default macOS terminal)
-
 [diff]
-    colorMoved = default
+    colorMoved = dimmed-zebra
+
+[help]
+    autocorrect = 10
+
+[init]
+    defaultBranch = main
 
 [interactive]
     diffFilter = delta --color-only
 
-[help]
-    autocorrect = 10
+[maintenance "commit-graph"]
+    enabled = true
+    schedule = hourly
+
+[maintenance "gc"]
+    enabled = true
+    schedule = weekly
+
+[maintenance "incremental-repack"]
+    enabled = true
+    schedule = daily
+
+[maintenance "loose-objects"]
+    enabled = true
+    schedule = daily
+
+[maintenance "pack-refs"]
+    enabled = true
+    schedule = daily
+
+[maintenance "prefetch"]
+    enabled = true
+    schedule = hourly
 
 [merge]
     conflictstyle = diff3
 
 [push]
-    default = current
     autoSetupRemote = true
-
-[pull]
-    rebase = true
+    default = current
 
 [rerere]
     enabled = true
-
-[init]
-    defaultBranch = main
