@@ -11,7 +11,7 @@
     aliases = config --get-regexp alias
     fp = fetch --all --prune --tags --force
     last = log --graph --pretty=tformat:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%an %cr)%Creset' -n15
-    oops = commit --amend --no-edit
+    oops = commit --amend --no-edit --date=now
     rb = rebase origin/master
     rbi = "!r() { git rebase -i HEAD~$1; }; r"
     st = status
