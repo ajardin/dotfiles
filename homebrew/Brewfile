@@ -47,6 +47,8 @@ brew "prettyping"
 brew "siege"
 # Cross-shell prompt for astronauts
 brew "starship"
+# Build, run, and manage Symfony applications
+brew "symfony-cli"
 # Display directories as trees (with optional color/HTML output)
 brew "tree"
 # Internet file retriever
@@ -59,8 +61,6 @@ cask "1password"
 cask "1password-cli"
 # Web browser focusing on privacy
 cask "brave-browser"
-# Voice and text chat software
-cask "discord"
 # A typeface made for developers by JetBrains
 cask "font-jetbrains-mono"
 # Tools to protect your emails and files
@@ -69,14 +69,14 @@ cask "gpg-suite"
 cask "imageoptim"
 # JetBrains tools manager
 cask "jetbrains-toolbox"
+# Online collaborative whiteboard platform
+cask "miro"
 # App to write, plan, collaborate, and get organized
 cask "notion"
 # OpenVPN Connect client
 cask "openvpn-connect"
 # Replacement for Docker Desktop
 cask "orbstack"
-# Collaboration platform for API development
-cask "postman"
 # Team communication and collaboration software
 cask "slack"
 # Music streaming service
