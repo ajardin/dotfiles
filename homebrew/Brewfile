@@ -1,6 +1,4 @@
 tap "homebrew/bundle"
-tap "homebrew/cask-fonts"
-tap "homebrew/cask-versions"
 tap "homebrew/services"
 
 # Official Amazon AWS command-line interface
@@ -47,6 +45,8 @@ brew "prettyping"
 brew "siege"
 # Cross-shell prompt for astronauts
 brew "starship"
+# Build, run, and manage Symfony applications
+brew "symfony-cli"
 # Display directories as trees (with optional color/HTML output)
 brew "tree"
 # Internet file retriever
@@ -54,33 +54,34 @@ brew "wget"
 # JavaScript package manager
 brew "yarn"
 
-# Password manager that keeps all passwords secure behind one password
-cask "1password"
-cask "1password-cli"
 # Web browser focusing on privacy
 cask "brave-browser"
-# Voice and text chat software
-cask "discord"
+# OpenAI's official ChatGPT desktop app
+cask "chatgpt"
+# Music player
+cask "deezer"
 # A typeface made for developers by JetBrains
 cask "font-jetbrains-mono"
+# Snippets management desktop application
+cask "gisto"
 # Tools to protect your emails and files
 cask "gpg-suite"
 # Tool to optimize images to a smaller size
 cask "imageoptim"
 # JetBrains tools manager
 cask "jetbrains-toolbox"
+# Online collaborative whiteboard platform
+cask "miro"
 # App to write, plan, collaborate, and get organized
 cask "notion"
 # OpenVPN Connect client
 cask "openvpn-connect"
 # Replacement for Docker Desktop
 cask "orbstack"
-# Collaboration platform for API development
-cask "postman"
 # Team communication and collaboration software
 cask "slack"
-# Music streaming service
-cask "spotify"
+# System monitor for the menu bar
+cask "stats"
 # File transfer application
 cask "transmit"
 # Rust-based terminal
