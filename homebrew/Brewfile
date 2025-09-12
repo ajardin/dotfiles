@@ -58,16 +58,14 @@ brew "yarn"
 cask "brave-browser"
 # OpenAI's official ChatGPT desktop app
 cask "chatgpt"
-# Music player
-cask "deezer"
+# Anthropic's official Claude AI desktop app
+cask "claude"
 # A typeface made for developers by JetBrains
 cask "font-jetbrains-mono"
 # Snippets management desktop application
 cask "gisto"
 # Tools to protect your emails and files
 cask "gpg-suite"
-# Tool to optimize images to a smaller size
-cask "imageoptim"
 # JetBrains tools manager
 cask "jetbrains-toolbox"
 # Online collaborative whiteboard platform
@@ -80,6 +78,8 @@ cask "openvpn-connect"
 cask "orbstack"
 # Team communication and collaboration software
 cask "slack"
+# Music streaming service
+cask "spotify"
 # System monitor for the menu bar
 cask "stats"
 # File transfer application
