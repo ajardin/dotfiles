@@ -54,12 +54,10 @@ brew "wget"
 # JavaScript package manager
 brew "yarn"
 
-# Web browser focusing on privacy
-cask "brave-browser"
 # OpenAI's official ChatGPT desktop app
 cask "chatgpt"
-# Anthropic's official Claude AI desktop app
-cask "claude"
+# Web browser
+cask "firefox"
 # A typeface made for developers by JetBrains
 cask "font-jetbrains-mono"
 # Snippets management desktop application
