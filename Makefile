@@ -22,12 +22,6 @@ homebrew: ## Installs Homebrew and the latest version of its packages
 	brew bundle install --file="${makefile_directory}/homebrew/Brewfile" --verbose
 .PHONY: homebrew
 
-macos: ## Installs all required software and some tweaks for macOS
-	xcode-select --print-path > /dev/null || xcode-select --install
-	softwareupdate --install-rosetta
-	bash "${makefile_directory}/macos/configure.sh"
-.PHONY: macos
-
 terminal: ## Deploys the configuration of the terminal
 	# Fish
 	mkdir -p "${HOME}/.config/fish"

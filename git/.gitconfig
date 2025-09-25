@@ -4,7 +4,7 @@
 [include]
     path = .gitconfig-corporate
 
-[includeIf "gitdir:~/Sites/ajardin/"]
+[includeIf "gitdir:~/Projects/ajardin/"]
     path = .gitconfig-opensource
 
 [alias]
