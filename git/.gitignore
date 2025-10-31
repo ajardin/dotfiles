@@ -5,6 +5,7 @@ auth.json
 # IDE #
 #######
 .idea/
+.junie/
 
 # Logs and databases #
 ######################
