@@ -54,10 +54,8 @@ brew "wget"
 # JavaScript package manager
 brew "yarn"
 
-# OpenAI's official ChatGPT desktop app
-cask "chatgpt"
-# Web browser
-cask "firefox"
+# OpenAI's official browser with ChatGPT built in
+cask "chatgpt-atlas"
 # A typeface made for developers by JetBrains
 cask "font-jetbrains-mono"
 # Snippets management desktop application
