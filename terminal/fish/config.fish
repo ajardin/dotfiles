@@ -20,4 +20,9 @@ fish_add_path --prepend "$HOME/.local/bin"
 fish_add_path --prepend "$HOME/.composer/vendor/bin"
 fish_add_path --prepend "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 
-/opt/homebrew/bin/starship init fish | source
+# pnpm
+set -gx PNPM_HOME "$HOME/Library/pnpm"
+if not string match -q -- $PNPM_HOME $PATH
+  set -gx PATH "$PNPM_HOME" $PATH
+end
+# pnpm end

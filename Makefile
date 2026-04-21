@@ -27,18 +27,14 @@ terminal: ## Deploys the configuration of the terminal
 	mkdir -p "${HOME}/.config/fish"
 	ln -sf "${makefile_directory}/terminal/fish/config.fish" "${HOME}/.config/fish/config.fish"
 	mkdir -p "${HOME}/.config/fish/functions"
-	ln -sf "${makefile_directory}/terminal/fish/functions/du.fish" "${HOME}/.config/fish/functions/du.fish"
-	ln -sf "${makefile_directory}/terminal/fish/functions/ip.fish" "${HOME}/.config/fish/functions/ip.fish"
-	ln -sf "${makefile_directory}/terminal/fish/functions/ll.fish" "${HOME}/.config/fish/functions/ll.fish"
-	ln -sf "${makefile_directory}/terminal/fish/functions/ping.fish" "${HOME}/.config/fish/functions/ping.fish"
-	ln -sf "${makefile_directory}/terminal/fish/functions/sed.fish" "${HOME}/.config/fish/functions/sed.fish"
-	ln -sf "${makefile_directory}/terminal/fish/functions/self-upgrade.fish" "${HOME}/.config/fish/functions/self-upgrade.fish"
-	ln -sf "${makefile_directory}/terminal/fish/functions/wipe.fish" "${HOME}/.config/fish/functions/wipe.fish"
+	for file in ${makefile_directory}/terminal/fish/functions/*.fish; do \
+		ln -sf "$$file" "${HOME}/.config/fish/functions/$$(basename $$file)"; \
+	done
 	# Warp
 	mkdir -p "${HOME}/.warp/themes"
-	ln -sf "${makefile_directory}/terminal/warp/themes/tokyo_night.yaml" "${HOME}/.warp/themes/tokyo_night.yaml"
-	# Starship
-	ln -sf "${makefile_directory}/terminal/starship.toml" "${HOME}/.config/starship.toml"
+	for file in ${makefile_directory}/terminal/warp/themes/*.yaml; do \
+		ln -sf "$$file" "${HOME}/.warp/themes/$$(basename $$file)"; \
+	done
 .PHONY: terminal
 
 help:

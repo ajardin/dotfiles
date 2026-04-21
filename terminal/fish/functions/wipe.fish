@@ -1,5 +1,6 @@
 function wipe
     git fp
-    git switch master
-    git reset --hard origin/master
+    set default_branch (git symbolic-ref --short refs/remotes/origin/HEAD | string replace 'origin/' '')
+    git switch $default_branch
+    git reset --hard origin/$default_branch
 end
