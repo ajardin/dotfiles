@@ -12,8 +12,7 @@
     fp = fetch --all --prune --tags --force
     last = log --graph --pretty=tformat:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%an %cr)%Creset' -n15
     oops = commit --amend --no-edit --date=now
-    rb = rebase origin/master
-    rbi = "!r() { git rebase -i HEAD~$1; }; r"
+    rb = "!git rebase $(git symbolic-ref --short refs/remotes/origin/HEAD)"
     st = status
 
 [checkout]
@@ -25,7 +24,6 @@
 [core]
     compression = 9
     excludesfile = ~/.gitignore
-    fscache = true
     fsmonitor = true
     pager = cat
     untrackedCache = true
@@ -45,32 +43,11 @@
 [interactive]
     diffFilter = delta --color-only
 
-[maintenance "commit-graph"]
-    enabled = true
-    schedule = hourly
-
-[maintenance "gc"]
-    enabled = true
-    schedule = weekly
-
-[maintenance "incremental-repack"]
-    enabled = true
-    schedule = daily
-
-[maintenance "loose-objects"]
-    enabled = true
-    schedule = daily
-
-[maintenance "pack-refs"]
-    enabled = true
-    schedule = daily
-
-[maintenance "prefetch"]
-    enabled = true
-    schedule = hourly
-
 [merge]
     conflictstyle = diff3
+
+[pull]
+    rebase = true
 
 [push]
     autoSetupRemote = true
