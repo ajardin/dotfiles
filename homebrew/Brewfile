@@ -5,8 +5,6 @@ tap "homebrew/services"
 brew "awscli"
 # Bourne-Again SHell, a UNIX command interpreter
 brew "bash"
-# Clone of cat(1) with syntax highlighting and Git integration
-brew "bat"
 # Dependency Manager for PHP
 brew "composer"
 # GNU File, Shell, and Text utilities
@@ -39,39 +37,39 @@ brew "node"
 brew "pipx"
 # General-purpose scripting language
 brew "php"
+# Fast, disk space efficient package manager
+brew "pnpm"
 # Wrapper to colorize and simplify ping's output
 brew "prettyping"
+# CLI proxy to minimize LLM token consumption
+brew "rtk"
 # HTTP regression testing and benchmarking utility
 brew "siege"
-# Cross-shell prompt for astronauts
-brew "starship"
-# Build, run, and manage Symfony applications
-brew "symfony-cli"
+# Utility-first CSS framework
+brew "tailwindcss"
 # Display directories as trees (with optional color/HTML output)
 brew "tree"
 # Internet file retriever
 brew "wget"
-# JavaScript package manager
-brew "yarn"
+# Feature-rich command-line audio/video downloader
+brew "yt-dlp"
 
-# Web browser focusing on privacy
-cask "brave-browser"
+# Managed client-based VPN service to securely access AWS resources
+cask "aws-vpn-client"
 # Anthropic's official Claude AI desktop app
 cask "claude"
 # Terminal-based AI coding assistant
-cask "claude-code"
+cask "claude-code@latest"
 # A typeface made for developers by JetBrains
 cask "font-jetbrains-mono"
-# Snippets management desktop application
-cask "gisto"
 # Tools to protect your emails and files
 cask "gpg-suite"
 # JetBrains tools manager
 cask "jetbrains-toolbox"
 # Online collaborative whiteboard platform
 cask "miro"
-# App to write, plan, collaborate, and get organized
-cask "notion"
+# Knowledge base that works on top of a local folder of plain text Markdown files
+cask "obsidian"
 # OpenVPN Connect client
 cask "openvpn-connect"
 # Replacement for Docker Desktop
@@ -84,5 +82,7 @@ cask "spotify"
 cask "stats"
 # File transfer application
 cask "transmit"
+# Web browser with built-in email client focusing on customization and control
+cask "vivaldi"
 # Rust-based terminal
 cask "warp"
