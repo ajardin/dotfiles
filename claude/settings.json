@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+
+  "tui": "fullscreen",
+  "model": "opus[1m]",
+  "effortLevel": "xhigh",
+  "autoUpdatesChannel": "latest",
+  "cleanupPeriodDays": 90,
+  "skipAutoPermissionPrompt": true,
+  "awaySummaryEnabled": true,
+
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+
+  "permissions": {
+    "deny": [
+      "Read(/**/.env)",
+      "Read(/**/.env.*)",
+      "Read(/**/secrets/**)",
+      "Read(/**/credentials.json)",
+      "Read(/**/*.pem)",
+      "Read(/**/*.key)"
+    ],
+    "disableBypassPermissionsMode": "disable"
+  },
+
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/rtk-rewrite.sh"
+          }
+        ]
+      }
+    ]
+  },
+
+  "statusLine": {
+    "type": "command",
+    "command": "python3 ~/.claude/statusline.py"
+  },
+
+  "enabledPlugins": {
+    "andrej-karpathy-skills@karpathy-skills": true,
+    "claude-code-setup@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "slack@claude-plugins-official": true,
+    "warp@claude-code-warp": true
+  },
+
+  "extraKnownMarketplaces": {
+    "claude-code-warp": {
+      "source": {
+        "source": "github",
+        "repo": "warpdotdev/claude-code-warp"
+      }
+    },
+    "karpathy-skills": {
+      "source": {
+        "source": "github",
+        "repo": "forrestchang/andrej-karpathy-skills"
+      }
+    }
+  }
+}

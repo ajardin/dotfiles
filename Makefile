@@ -7,6 +7,15 @@
 makefile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 makefile_directory := $(realpath $(dir $(makefile_path)))
 
+claude: ## Deploys the Claude configuration files
+	mkdir -p "${HOME}/.claude/hooks"
+	ln -sf "${makefile_directory}/claude/settings.json" "${HOME}/.claude/settings.json"
+	ln -sf "${makefile_directory}/claude/statusline.py" "${HOME}/.claude/statusline.py"
+	ln -sf "${makefile_directory}/claude/global.md" "${HOME}/.claude/CLAUDE.md"
+	ln -sf "${makefile_directory}/claude/RTK.md" "${HOME}/.claude/RTK.md"
+	ln -sf "${makefile_directory}/claude/hooks/rtk-rewrite.sh" "${HOME}/.claude/hooks/rtk-rewrite.sh"
+.PHONY: claude
+
 git: ## Deploys the Git configuration files
 	ln -sf "${makefile_directory}/git/.gitconfig" "${HOME}/.gitconfig"
 	ln -sf "${makefile_directory}/git/.gitconfig-opensource" "${HOME}/.gitconfig-opensource"
