@@ -1,6 +1,8 @@
 tap "homebrew/bundle"
 tap "homebrew/services"
 
+# Static checker for GitHub Actions workflow files
+brew "actionlint"
 # Official Amazon AWS command-line interface
 brew "awscli"
 # Bourne-Again SHell, a UNIX command interpreter
@@ -17,10 +19,18 @@ brew "dos2unix"
 brew "fish"
 # Monitor a directory for changes and run a shell command
 brew "fswatch"
+# GitHub command-line tool
+brew "gh"
 # Distributed revision control system
 brew "git"
 # GNU implementation of the famous stream editor
 brew "gnu-sed"
+# Open source programming language to build simple/reliable/efficient software
+brew "go"
+# Fast linters runner for Go
+brew "golangci-lint"
+# Deliver Go binaries as fast and easily as possible
+brew "goreleaser"
 # Improved top (interactive process viewer)
 brew "htop"
 # Lightweight and flexible command-line JSON processor
@@ -33,12 +43,16 @@ brew "mkcert"
 brew "ncdu"
 # Platform built on V8 to build network applications
 brew "node"
+# Perl compatible regular expressions library
+brew "pcre"
 # Execute binaries from Python packages in isolated environments
 brew "pipx"
 # General-purpose scripting language
 brew "php"
 # Fast, disk space efficient package manager
 brew "pnpm"
+# PDF rendering library (based on the xpdf-3.0 code base)
+brew "poppler"
 # Wrapper to colorize and simplify ping's output
 brew "prettyping"
 # CLI proxy to minimize LLM token consumption
@@ -49,10 +63,14 @@ brew "siege"
 brew "tailwindcss"
 # Display directories as trees (with optional color/HTML output)
 brew "tree"
+# Extremely fast Python package installer and resolver, written in Rust
+brew "uv"
 # Internet file retriever
 brew "wget"
 # Feature-rich command-line audio/video downloader
 brew "yt-dlp"
+# General-purpose lossless data-compression library
+brew "zlib"
 
 # Managed client-based VPN service to securely access AWS resources
 cask "aws-vpn-client"
@@ -70,8 +88,6 @@ cask "jetbrains-toolbox"
 cask "miro"
 # Knowledge base that works on top of a local folder of plain text Markdown files
 cask "obsidian"
-# OpenVPN Connect client
-cask "openvpn-connect"
 # Replacement for Docker Desktop
 cask "orbstack"
 # Team communication and collaboration software
@@ -82,6 +98,8 @@ cask "spotify"
 cask "stats"
 # File transfer application
 cask "transmit"
+# Free and open source AI image upscaler
+cask "upscayl"
 # Web browser with built-in email client focusing on customization and control
 cask "vivaldi"
 # Rust-based terminal
