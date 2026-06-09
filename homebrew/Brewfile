@@ -104,3 +104,5 @@ cask "upscayl"
 cask "vivaldi"
 # Rust-based terminal
 cask "warp"
+# Voice-to-text dictation with AI-powered auto-editing
+cask "wispr-flow"
