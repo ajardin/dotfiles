@@ -14,6 +14,7 @@ claude: ## Deploys the Claude configuration files
 	ln -sf "${makefile_directory}/claude/global.md" "${HOME}/.claude/CLAUDE.md"
 	ln -sf "${makefile_directory}/claude/RTK.md" "${HOME}/.claude/RTK.md"
 	ln -sf "${makefile_directory}/claude/hooks/rtk-rewrite.sh" "${HOME}/.claude/hooks/rtk-rewrite.sh"
+	ln -sf "${makefile_directory}/claude/hooks/command-history.sh" "${HOME}/.claude/hooks/command-history.sh"
 .PHONY: claude
 
 git: ## Deploys the Git configuration files

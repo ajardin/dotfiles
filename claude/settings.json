@@ -6,13 +6,26 @@
     "pr": ""
   },
   "permissions": {
+    "allow": [
+      "Bash(docker compose ps)",
+      "Bash(docker compose ps *)",
+      "Bash(docker compose config *)",
+      "mcp__datadog-mcp__search_datadog_logs",
+      "mcp__datadog-mcp__search_datadog_metrics",
+      "mcp__datadog-mcp__get_datadog_incident",
+      "mcp__datadog-mcp__load_datadog_skill",
+      "mcp__atlassian__getJiraIssue"
+    ],
     "deny": [
       "Read(/**/.env)",
       "Read(/**/.env.*)",
       "Read(/**/secrets/**)",
       "Read(/**/credentials.json)",
       "Read(/**/*.pem)",
-      "Read(/**/*.key)"
+      "Read(/**/*.key)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.gnupg/**)"
     ],
     "disableBypassPermissionsMode": "disable"
   },
@@ -24,6 +37,17 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/rtk-rewrite.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/command-history.sh"
           }
         ]
       }
@@ -61,6 +85,9 @@
   },
   "awaySummaryEnabled": true,
   "autoUpdatesChannel": "latest",
+  "model": "claude-fable-5[1m]",
+  "effortLevel": "high",
+  "alwaysThinkingEnabled": true,
   "tui": "fullscreen",
   "theme": "dark-ansi",
   "skipAutoPermissionPrompt": true

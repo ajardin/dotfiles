@@ -9,10 +9,13 @@ README explains **why** each choice is made, not just what it does.
 
 - **`tui: "fullscreen"`** — Claude Code is the primary tool, not a side panel. Fullscreen avoids losing context to
   terminal scroll.
-- **`model: "opus[1m]"`** — Opus is the most capable model available; the 1M context window absorbs large codebases
-  without premature compaction.
-- **`effortLevel: "xhigh"`** — prioritizes reasoning quality over latency. Matches the kind of multi-step engineering
-  work this setup is for.
+- **`model: "claude-fable-5[1m]"`** — the most capable model available; the 1M context window absorbs large
+  codebases without premature compaction. Pinned in `settings.json` so the choice is versioned and portable across
+  machines instead of living in per-machine session state.
+- **`effortLevel: "high"`** — was `xhigh` on Opus; dialed back to `high` with the move to Fable 5, which reaches the
+  same quality with less reasoning budget.
+- **`alwaysThinkingEnabled: true`** — extended thinking on by default. Prioritizes reasoning quality over latency,
+  matching the kind of multi-step engineering work this setup is for.
 - **`autoUpdatesChannel: "latest"`** — accept some churn in exchange for new features as soon as they ship.
 - **`awaySummaryEnabled: true`** — keeps the built-in `/recap` away-summary on. It's the default, but pinned
   explicitly so the intent is visible and a future Claude Code change can't silently turn it off.
@@ -21,8 +24,12 @@ README explains **why** each choice is made, not just what it does.
 
 ### Safety
 
-- **`permissions.deny`** — defense-in-depth against accidental reads of `.env`, `.pem`, `.key`, `secrets/`.
+- **`permissions.deny`** — defense-in-depth against accidental reads of `.env`, `.pem`, `.key`, `secrets/` in
+  projects, plus home-directory credentials (`~/.ssh`, `~/.aws`, `~/.gnupg`).
   Belt-and-suspenders alongside `.gitignore`: an agent should not be able to ingest these files even if asked.
+- **`permissions.allow`** — short allowlist of read-only commands observed in real transcripts (`docker compose ps`,
+  a few Datadog/Jira MCP read tools). Reduces prompt fatigue without granting anything that mutates state or
+  executes arbitrary code — `docker exec`, `rtk proxy`, `gh api *` and the like stay out on purpose.
 - **`disableBypassPermissionsMode: "disable"`** — bypass mode skips all permission checks. Disabling it ensures
   sensitive operations always prompt, even under time pressure.
 - **`skipAutoPermissionPrompt: true`** — the explicit `deny` rules above already gate the dangerous reads; extra
@@ -88,3 +95,10 @@ Why bother:
 
 The exit-code contract (`0` allow, `1` passthrough, `2` deny, `3` ask) is the integration boundary; everything else
 lives inside `rtk` itself, which keeps repo-side logic out of this dotfiles tree.
+
+## Command history (`hooks/command-history.sh`)
+
+A PostToolUse hook on `Bash` appends every executed command to a daily JSONL file
+(`~/.claude/command-history/YYYY-MM-DD.jsonl`) with timestamp, session id and cwd. The goal is studying agent
+behavior over time. Commands are captured *after* the RTK rewrite — i.e. as actually executed. The hook always exits
+0 so a logging failure can never disturb a session.

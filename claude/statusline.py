@@ -1,26 +1,35 @@
 #!/usr/bin/env python3
+"""Claude Code status line.
+
+Reads the status-line JSON payload from stdin and prints one line:
+model, effort level, context usage, rate-limit gauges, git branch.
+Any failure degrades to a minimal fallback — the status line must never crash.
+"""
+
+from __future__ import annotations
 
 import json
 import os
 import sys
-from datetime import datetime, timezone
+import time
 
 # --- ANSI ---
 RED = "\033[31m"
 GREEN = "\033[32m"
 YELLOW = "\033[33m"
 RESET = "\033[0m"
-BOLD = "\033[1m"
 DIM = "\033[2m"
 
 SEP = f" {DIM}·{RESET} "
 
+BAR_LENGTH = 10
+# Usage thresholds (%), tuned around the 200k-token auto-compact boundary.
+WARN_PCT = 60
+DANGER_PCT = 80
+DEFAULT_CONTEXT_WINDOW = 200_000
 
-def now_epoch():
-    return datetime.now(timezone.utc).timestamp()
 
-
-def fmt_tokens(n):
+def fmt_tokens(n: float | None) -> str:
     n = float(n or 0)
     if n >= 1_000_000:
         v = n / 1_000_000
@@ -31,7 +40,7 @@ def fmt_tokens(n):
     return str(int(n))
 
 
-def fmt_duration(secs):
+def fmt_duration(secs: float) -> str:
     secs = int(secs)
     if secs <= 0:
         return "now"
@@ -45,22 +54,22 @@ def fmt_duration(secs):
     return f"{m}m"
 
 
-def color_usage(pct):
+def usage_color(pct: float) -> str:
     # higher = worse (context, rate limits)
-    if pct >= 80:
+    if pct >= DANGER_PCT:
         return RED
-    if pct >= 60:
+    if pct >= WARN_PCT:
         return YELLOW
     return GREEN
 
 
-def bar(pct, length=10):
+def bar(pct: float, length: int = BAR_LENGTH) -> str:
     pct = max(0, min(100, pct))
     filled = int(round(pct * length / 100))
     return "█" * filled + "░" * (length - filled)
 
 
-def git_branch(start_dir):
+def git_branch(start_dir: str | None) -> str | None:
     """Current branch by reading .git/HEAD directly (no subprocess). None if not a repo."""
     try:
         if not start_dir:
@@ -92,38 +101,24 @@ def git_branch(start_dir):
         if ref.startswith("ref:"):
             return ref.split("/", 2)[-1]  # refs/heads/feat/x -> feat/x
         return ref[:7] if ref else None   # detached HEAD -> short sha
-    except Exception:
+    except OSError:
         return None
 
 
-def gauge(label, window):
+def gauge(label: str, window: dict) -> str | None:
     """'5h ▓▓░░░░░░░░ 24% ↻3h25m' from a rate-limit window dict, or None if absent."""
     pct = window.get("used_percentage")
     if pct is None:
         return None
-    c = color_usage(pct)
+    c = usage_color(pct)
     s = f"{DIM}{label}{RESET} {c}{bar(pct)} {pct:.0f}%{RESET}"
     resets_at = window.get("resets_at")
     if resets_at:
-        s += f" {DIM}↻{fmt_duration(resets_at - now_epoch())}{RESET}"
+        s += f" {DIM}↻{fmt_duration(resets_at - time.time())}{RESET}"
     return s
 
 
-def hyperlink(url, text):
-    """OSC 8 clickable link (BEL-terminated); plain text if no URL."""
-    return f"\033]8;;{url}\a{text}\033]8;;\a" if url else text
-
-
-def review_glyph(state):
-    return {
-        "approved": f"{GREEN}✓{RESET}",
-        "changes_requested": f"{RED}✗{RESET}",
-        "pending": f"{YELLOW}●{RESET}",
-        "draft": f"{DIM}draft{RESET}",
-    }.get(state, "")
-
-
-def build_line1(data):
+def build_status(data: dict) -> str:
     parts = [data.get("model", {}).get("display_name", "Claude")]
 
     level = (data.get("effort") or {}).get("level")
@@ -142,20 +137,18 @@ def build_line1(data):
             + (cu.get("cache_creation_input_tokens") or 0)
             + (cu.get("cache_read_input_tokens") or 0)
         )
-        total = ctx.get("context_window_size") or 200000
-        c = color_usage(pct)
+        total = ctx.get("context_window_size") or DEFAULT_CONTEXT_WINDOW
+        c = usage_color(pct)
         seg = f"Context: {c}{bar(pct)} {pct:3d}%{RESET}"
         if used:
             seg += f" {DIM}{fmt_tokens(used)}/{fmt_tokens(total)}{RESET}"
         parts.append(seg)
 
     rl = data.get("rate_limits") or {}
-    five = gauge("5h", rl.get("five_hour") or {})
-    if five:
-        parts.append(five)
-    seven = gauge("7d", rl.get("seven_day") or {})
-    if seven:
-        parts.append(seven)
+    for label, key in (("5h", "five_hour"), ("7d", "seven_day")):
+        g = gauge(label, rl.get(key) or {})
+        if g:
+            parts.append(g)
 
     branch = git_branch((data.get("workspace") or {}).get("current_dir") or data.get("cwd"))
     if branch:
@@ -164,44 +157,17 @@ def build_line1(data):
     return SEP.join(parts)
 
 
-def build_line2(data):
-    """PR status (clickable) + worktree name. '' when neither is present."""
-    segs = []
-
-    pr = data.get("pr") or {}
-    num = pr.get("number")
-    if num is not None:
-        seg = hyperlink(pr.get("url"), f"PR #{num}")
-        g = review_glyph(pr.get("review_state"))
-        if g:
-            seg += f" {g}"
-        segs.append(seg)
-
-    wt = (data.get("worktree") or {}).get("name") or (data.get("workspace") or {}).get("git_worktree")
-    if wt:
-        segs.append(f"{DIM}worktree{RESET} {wt}")
-
-    return SEP.join(segs) if segs else ""
-
-
-def main():
+def main() -> None:
+    # Broad excepts are deliberate: a status line must always print something.
     try:
         data = json.load(sys.stdin)
     except Exception:
         print("Claude | Context: Ready")
         return
-
     try:
-        print(build_line1(data))
+        print(build_status(data))
     except Exception:
         print(data.get("model", {}).get("display_name", "Claude"))
-        return
-    try:
-        line2 = build_line2(data)
-    except Exception:
-        line2 = ""
-    if line2:
-        print(line2)
 
 
 if __name__ == "__main__":
