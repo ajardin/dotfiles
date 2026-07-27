@@ -101,7 +101,7 @@ def git_branch(start_dir: str | None) -> str | None:
         if ref.startswith("ref:"):
             return ref.split("/", 2)[-1]  # refs/heads/feat/x -> feat/x
         return ref[:7] if ref else None   # detached HEAD -> short sha
-    except OSError:
+    except (OSError, UnicodeDecodeError):
         return None
 
 
@@ -110,16 +110,28 @@ def gauge(label: str, window: dict) -> str | None:
     pct = window.get("used_percentage")
     if pct is None:
         return None
-    c = usage_color(pct)
-    s = f"{DIM}{label}{RESET} {c}{bar(pct)} {pct:.0f}%{RESET}"
     resets_at = window.get("resets_at")
-    if resets_at:
-        s += f" {DIM}↻{fmt_duration(resets_at - time.time())}{RESET}"
+    remaining = resets_at - time.time() if resets_at else None
+    # Past its reset the window has restarted, but the payload keeps serving the
+    # pre-reset figure until an API response refreshes it — flag it rather than
+    # colour a number we know is wrong.
+    stale = remaining is not None and remaining <= 0
+    c = DIM if stale else usage_color(pct)
+    s = f"{DIM}{label}{RESET} {c}{bar(pct)} {pct:.0f}%{RESET}"
+    if stale:
+        return f"{s} {DIM}stale{RESET}"
+    if remaining is not None:
+        s += f" {DIM}↻{fmt_duration(remaining)}{RESET}"
     return s
 
 
+def model_name(data: dict) -> str:
+    """Model label, resilient to a null 'model' or 'display_name' — also the crash fallback."""
+    return (data.get("model") or {}).get("display_name") or "Claude"
+
+
 def build_status(data: dict) -> str:
-    parts = [data.get("model", {}).get("display_name", "Claude")]
+    parts = [model_name(data)]
 
     level = (data.get("effort") or {}).get("level")
     if level:
@@ -131,15 +143,11 @@ def build_status(data: dict) -> str:
         parts.append("Context: Ready")
     else:
         pct = int(round(pct))
-        cu = ctx.get("current_usage") or {}
-        used = (
-            (cu.get("input_tokens") or 0)
-            + (cu.get("cache_creation_input_tokens") or 0)
-            + (cu.get("cache_read_input_tokens") or 0)
-        )
+        # total_input_tokens is the payload's own sum of input + cache creation + cache read.
+        used = ctx.get("total_input_tokens") or 0
         total = ctx.get("context_window_size") or DEFAULT_CONTEXT_WINDOW
         c = usage_color(pct)
-        seg = f"Context: {c}{bar(pct)} {pct:3d}%{RESET}"
+        seg = f"Context: {c}{bar(pct)} {pct:d}%{RESET}"
         if used:
             seg += f" {DIM}{fmt_tokens(used)}/{fmt_tokens(total)}{RESET}"
         parts.append(seg)
@@ -162,12 +170,14 @@ def main() -> None:
     try:
         data = json.load(sys.stdin)
     except Exception:
-        print("Claude | Context: Ready")
-        return
+        data = {}
+    if not isinstance(data, dict):
+        data = {}
     try:
         print(build_status(data))
     except Exception:
-        print(data.get("model", {}).get("display_name", "Claude"))
+        # model_name only touches dicts, so this cannot raise in turn.
+        print(model_name(data))
 
 
 if __name__ == "__main__":

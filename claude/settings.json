@@ -29,6 +29,7 @@
     ],
     "disableBypassPermissionsMode": "disable"
   },
+  "model": "opus[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -66,7 +67,6 @@
     "code-simplifier@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
-    "slack@claude-plugins-official": true,
     "warp@claude-code-warp": true
   },
   "extraKnownMarketplaces": {
@@ -83,11 +83,10 @@
       }
     }
   },
+  "alwaysThinkingEnabled": true,
+  "effortLevel": "xhigh",
   "awaySummaryEnabled": true,
   "autoUpdatesChannel": "latest",
-  "model": "claude-fable-5[1m]",
-  "effortLevel": "high",
-  "alwaysThinkingEnabled": true,
   "tui": "fullscreen",
   "theme": "dark-ansi",
   "skipAutoPermissionPrompt": true
