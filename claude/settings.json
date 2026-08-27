@@ -67,7 +67,8 @@
     "code-simplifier@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
-    "warp@claude-code-warp": true
+    "warp@claude-code-warp": true,
+    "claude-security@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "claude-code-warp": {
@@ -83,11 +84,16 @@
       }
     }
   },
+  "outputStyle": "Concise",
   "alwaysThinkingEnabled": true,
-  "effortLevel": "xhigh",
+  "effortLevel": "high",
+  "advisorModel": "fable",
   "awaySummaryEnabled": true,
   "autoUpdatesChannel": "latest",
   "tui": "fullscreen",
+  "skipWorkflowUsageWarning": true,
   "theme": "dark-ansi",
+  "autoContinueAtUsageLimit": true,
+  "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true
 }
