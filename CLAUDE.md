@@ -21,15 +21,16 @@ Targets are independent and idempotent (re-running re-creates symlinks). There i
 ## Deployment model and gotchas
 
 - `git` target creates `~/.gitconfig-corporate` as an empty file via `touch` — this is intentional. `git/.gitconfig` includes it unconditionally and the `includeIf "gitdir:~/Projects/ajardin/"` block then layers `.gitconfig-opensource` on top for repos under that path. The corporate file stays out of the repo so work-specific `user.email` / signing config can live there without leaking.
-- `claude` target symlinks `claude/global.md` to `~/.claude/CLAUDE.md` (Claude Code requires that filename in `~/.claude/`) and `claude/RTK.md` into `~/.claude/`. The repo source is named `global.md` to avoid confusion with this per-repo `CLAUDE.md`; `global.md` only contains `@RTK.md`.
-- `homebrew` target both installs Homebrew (if absent) **and** runs `brew bundle install` against `homebrew/Brewfile`. `Brewfile.lock.json` is committed and updated by Homebrew on bundle runs.
+- `claude` target symlinks `claude/global.md` to `~/.claude/CLAUDE.md` (Claude Code requires that filename in `~/.claude/`) and `claude/RTK.md` into `~/.claude/`. The repo source is named `global.md` to avoid confusion with this per-repo `CLAUDE.md`. It imports `@RTK.md` and then adds two standing bans: never run SQL directly, and never open a credential file (the ban is stated for `Grep`, `Bash` and subagents too, since the `Read` deny rules in `settings.json` only bind one tool).
+- `homebrew` target both installs Homebrew (if absent) **and** runs `brew bundle install` against `homebrew/Brewfile`. `Brewfile.lock.json` is written by Homebrew on bundle runs but is listed in `.gitignore` and deliberately not tracked.
 - `terminal` target globs `terminal/fish/functions/*.fish` — adding a new file there and re-running `make terminal` is enough to wire it up. The Ghostty (`terminal/ghostty/config.ghostty` → `~/.config/ghostty/`) and Starship (`terminal/starship/starship.toml` → `~/.config/starship.toml`) symlinks are explicit, so a new file in either directory has to be added to the recipe by hand.
 
 ## Claude Code integration
 
-`claude/settings.json` is the user's global Claude Code config (symlinked to `~/.claude/settings.json`). Two parts are load-bearing:
+`claude/settings.json` is the user's global Claude Code config (symlinked to `~/.claude/settings.json`). Three parts are load-bearing:
 
 - **RTK PreToolUse hook** (`claude/hooks/rtk-rewrite.sh`) intercepts every `Bash` tool call and delegates to `rtk rewrite` to rewrite commands for token-efficient output. The script is a thin shim — all rewrite rules live in the `rtk` Rust binary, not here. Exit codes from `rtk rewrite` (0 allow, 1 passthrough, 2 deny, 3 ask) drive the hook's response. When editing this hook, preserve the exit-code contract documented in its header.
+- **Command-history PostToolUse hook** (`claude/hooks/command-history.sh`) appends every executed `Bash` command to a daily JSONL file under `~/.claude/command-history/`, capturing it *after* the RTK rewrite — i.e. as actually executed. It always exits 0 so a logging failure can never disturb a session; preserve that when editing.
 - **Status line** (`claude/statusline.py`) reads JSON from stdin and prints a context-usage bar; thresholds are tuned around the 200k-token auto-compact boundary.
 
 `enabledPlugins` and `extraKnownMarketplaces` in `settings.json` pin the user's plugin set — adding a plugin here is the canonical way to enable it system-wide.

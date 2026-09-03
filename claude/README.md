@@ -9,11 +9,13 @@ README explains **why** each choice is made, not just what it does.
 
 - **`tui: "fullscreen"`** — Claude Code is the primary tool, not a side panel. Fullscreen avoids losing context to
   terminal scroll.
-- **`model: "claude-fable-5[1m]"`** — the most capable model available; the 1M context window absorbs large
-  codebases without premature compaction. Pinned in `settings.json` so the choice is versioned and portable across
-  machines instead of living in per-machine session state.
-- **`effortLevel: "high"`** — was `xhigh` on Opus; dialed back to `high` with the move to Fable 5, which reaches the
-  same quality with less reasoning budget.
+- **`model: "opus[1m]"`** — Opus 5 with the 1M context window, which absorbs large codebases without premature
+  compaction. Pinned in `settings.json` so the choice is versioned and portable across machines instead of living in
+  per-machine session state.
+- **`advisorModel: "fable"`** — the `advisor` tool runs on Fable rather than the session model, so review passes
+  come from a second opinion instead of the same model that wrote the code.
+- **`effortLevel: "high"`** — reasoning budget per turn. Ran at `xhigh` for a while after the switch back to Opus,
+  then dialed back to `high`: the extra budget was not paying for itself on day-to-day work.
 - **`alwaysThinkingEnabled: true`** — extended thinking on by default. Prioritizes reasoning quality over latency,
   matching the kind of multi-step engineering work this setup is for.
 - **`autoUpdatesChannel: "latest"`** — accept some churn in exchange for new features as soon as they ship.
@@ -42,7 +44,8 @@ README explains **why** each choice is made, not just what it does.
 
 ## `statusline.py`
 
-Shows the model name, a 10-cell context-usage bar, and lines added/removed. The point is the thresholds:
+Shows the model name, the effort level, a 10-cell context-usage bar and the current git branch. The point is the
+thresholds:
 
 - **Green** below 60% / 160k tokens — safe zone.
 - **Yellow** at 60% or 160k tokens — early warning that auto-compact is approaching.
@@ -70,12 +73,13 @@ repo by repo.
   a new project.
 - **`claude-md-management`** — audits and improves `CLAUDE.md` files. Keeps project memory from drifting away from
   the code as it evolves.
+- **`claude-security`** — multi-agent security scan of a repository. Verified findings come back as patch files to
+  apply on demand rather than edits made in place.
 - **`code-review`** — PR reviews from the CLI without leaving the editor.
 - **`code-simplifier`** — second-pass cleanup after writing code; fights accumulated complexity.
 - **`context7`** — fetches up-to-date library docs. Compensates for training-data lag against recent framework
   versions.
 - **`frontend-design`** — frontend scaffolding skill with some visual polish, used occasionally.
-- **`slack`** — send Slack messages from Claude Code (status updates, PR links).
 
 ## RTK (`RTK.md`, `hooks/rtk-rewrite.sh`)
 
