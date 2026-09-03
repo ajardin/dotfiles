@@ -1,0 +1,50 @@
+# ─── Shell ──────────────────────────────────────────────────────────
+command = /opt/homebrew/bin/fish
+
+shell-integration-features = cursor,sudo,title,ssh-env,ssh-terminfo,path
+cursor-click-to-move = true
+
+# ─── Working directory ──────────────────────────────────────────────
+working-directory = home
+
+window-inherit-working-directory = false
+tab-inherit-working-directory = false
+split-inherit-working-directory = false
+
+# ─── Appearance ─────────────────────────────────────────────────────
+theme = TokyoNight Night
+minimum-contrast = 1.1
+
+# ─── Font ───────────────────────────────────────────────────────────
+font-family = JetBrains Mono
+font-size = 14
+font-thicken = true
+font-thicken-strength = 128
+adjust-cell-height = 6%
+
+# ─── Window ─────────────────────────────────────────────────────────
+window-padding-x = 8
+window-padding-y = 6
+window-padding-balance = true
+window-new-tab-position = end
+window-save-state = always
+macos-titlebar-style = tabs
+
+# ─── Quick terminal ─────────────────────────────────────────────────
+quick-terminal-position = top
+quick-terminal-size = 40%
+
+# ─── Scrolling and selection ────────────────────────────────────────
+scrollback-limit = 100000
+selection-word-chars = " \t'\"│`|;,()[]{}<>$"
+mouse-hide-while-typing = true
+
+# ─── Command finish notifications ───────────────────────────────────
+notify-on-command-finish = unfocused
+notify-on-command-finish-action = no-bell,notify
+notify-on-command-finish-after = 10s
+
+# ─── Keybinds ───────────────────────────────────────────────────────
+keybind = ctrl+shift+up=jump_to_prompt:-1
+keybind = ctrl+shift+down=jump_to_prompt:1
+keybind = global:cmd+backquote=toggle_quick_terminal

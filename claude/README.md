@@ -76,7 +76,6 @@ repo by repo.
   versions.
 - **`frontend-design`** — frontend scaffolding skill with some visual polish, used occasionally.
 - **`slack`** — send Slack messages from Claude Code (status updates, PR links).
-- **`warp`** — native integration with the Warp terminal.
 
 ## RTK (`RTK.md`, `hooks/rtk-rewrite.sh`)
 

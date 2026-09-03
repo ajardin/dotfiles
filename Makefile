@@ -33,6 +33,9 @@ homebrew: ## Installs Homebrew and the latest version of its packages
 .PHONY: homebrew
 
 terminal: ## Deploys the configuration of the terminal
+	# Ghostty
+	mkdir -p "${HOME}/.config/ghostty"
+	ln -sf "${makefile_directory}/terminal/ghostty/config.ghostty" "${HOME}/.config/ghostty/config.ghostty"
 	# Fish
 	mkdir -p "${HOME}/.config/fish"
 	ln -sf "${makefile_directory}/terminal/fish/config.fish" "${HOME}/.config/fish/config.fish"
@@ -40,11 +43,8 @@ terminal: ## Deploys the configuration of the terminal
 	for file in ${makefile_directory}/terminal/fish/functions/*.fish; do \
 		ln -sf "$$file" "${HOME}/.config/fish/functions/$$(basename $$file)"; \
 	done
-	# Warp
-	mkdir -p "${HOME}/.warp/themes"
-	for file in ${makefile_directory}/terminal/warp/themes/*.yaml; do \
-		ln -sf "$$file" "${HOME}/.warp/themes/$$(basename $$file)"; \
-	done
+	# Starship
+	ln -sf "${makefile_directory}/terminal/starship/starship.toml" "${HOME}/.config/starship.toml"
 .PHONY: terminal
 
 help:

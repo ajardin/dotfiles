@@ -59,6 +59,8 @@ brew "prettyping"
 brew "rtk"
 # HTTP regression testing and benchmarking utility
 brew "siege"
+# Cross-shell prompt for astronauts
+brew "starship"
 # Utility-first CSS framework
 brew "tailwindcss"
 # Display directories as trees (with optional color/HTML output)
@@ -80,6 +82,8 @@ cask "claude"
 cask "claude-code@latest"
 # A typeface made for developers by JetBrains
 cask "font-jetbrains-mono"
+# Terminal emulator that uses platform-native UI and GPU acceleration
+cask "ghostty"
 # Tools to protect your emails and files
 cask "gpg-suite"
 # JetBrains tools manager
@@ -102,7 +106,5 @@ cask "transmit"
 cask "upscayl"
 # Web browser with built-in email client focusing on customization and control
 cask "vivaldi"
-# Rust-based terminal
-cask "warp"
 # Voice-to-text dictation with AI-powered auto-editing
 cask "wispr-flow"

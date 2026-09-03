@@ -13,7 +13,7 @@ make help        # default target — list all targets with descriptions
 make claude      # symlink claude/ files into ~/.claude/
 make git         # symlink git/ files into ~/ (also touches ~/.gitconfig-corporate)
 make homebrew    # install Homebrew if missing, then `brew bundle install` from homebrew/Brewfile
-make terminal    # symlink fish config + functions and Warp themes
+make terminal    # symlink Ghostty config, fish config + functions, and Starship prompt
 ```
 
 Targets are independent and idempotent (re-running re-creates symlinks). There is no test suite, linter, or CI.
@@ -23,7 +23,7 @@ Targets are independent and idempotent (re-running re-creates symlinks). There i
 - `git` target creates `~/.gitconfig-corporate` as an empty file via `touch` — this is intentional. `git/.gitconfig` includes it unconditionally and the `includeIf "gitdir:~/Projects/ajardin/"` block then layers `.gitconfig-opensource` on top for repos under that path. The corporate file stays out of the repo so work-specific `user.email` / signing config can live there without leaking.
 - `claude` target symlinks `claude/global.md` to `~/.claude/CLAUDE.md` (Claude Code requires that filename in `~/.claude/`) and `claude/RTK.md` into `~/.claude/`. The repo source is named `global.md` to avoid confusion with this per-repo `CLAUDE.md`; `global.md` only contains `@RTK.md`.
 - `homebrew` target both installs Homebrew (if absent) **and** runs `brew bundle install` against `homebrew/Brewfile`. `Brewfile.lock.json` is committed and updated by Homebrew on bundle runs.
-- `terminal` target globs `terminal/fish/functions/*.fish` and `terminal/warp/themes/*.yaml` — adding a new file in either directory and re-running `make terminal` is enough to wire it up.
+- `terminal` target globs `terminal/fish/functions/*.fish` — adding a new file there and re-running `make terminal` is enough to wire it up. The Ghostty (`terminal/ghostty/config.ghostty` → `~/.config/ghostty/`) and Starship (`terminal/starship/starship.toml` → `~/.config/starship.toml`) symlinks are explicit, so a new file in either directory has to be added to the recipe by hand.
 
 ## Claude Code integration
 
