@@ -1,6 +1,4 @@
 tap "ajardin/tap"
-tap "homebrew/bundle"
-tap "homebrew/services"
 
 # Static checker for GitHub Actions workflow files
 brew "actionlint"
