@@ -185,3 +185,10 @@ A PostToolUse hook on `Bash` appends every executed command to a daily JSONL fil
 (`~/.claude/command-history/YYYY-MM-DD.jsonl`) with timestamp, session id and cwd. The goal is studying agent
 behavior over time. Commands are captured *after* the RTK rewrite — i.e. as actually executed. The hook always exits
 0 so a logging failure can never disturb a session.
+
+Retention reuses **`cleanupPeriodDays`** rather than declaring a second number: the log is a companion to the
+transcripts, so keeping it longer than them would only leave a record of sessions that no longer exist. The hook
+reads the key from `settings.json` on each prune, which means changing the setting moves both windows at once, and
+falls back to 90 when the key is absent or not a plain integer. Because a PostToolUse hook fires on every `Bash`
+call, the prune is throttled to once a day through a `.last-prune` stamp in the history directory; the stamp is
+written *before* the `find` runs, so a prune that fails waits for tomorrow instead of retrying on every command.

@@ -98,7 +98,9 @@ are load-bearing:
   with `rtk init --show`, `rtk hook check '<cmd>'` and `rtk verify`.
 - **Command-history PostToolUse hook** (`claude/hooks/command-history.sh`) appends every executed `Bash` command to a
   daily JSONL file under `~/.claude/command-history/`, capturing it *after* the RTK rewrite — i.e. as actually
-  executed. It always exits 0 so a logging failure can never disturb a session; preserve that when editing.
+  executed. It also prunes its own files on the `cleanupPeriodDays` window read from `settings.json`, so the two
+  retentions cannot drift apart; the prune is throttled to once a day because the hook runs on every `Bash` call. It
+  always exits 0 so a logging failure can never disturb a session; preserve that when editing.
 - **Status line** (`claude/statusline.py`) reads the status-line JSON from stdin and prints one `·`-separated line:
   model, effort level, context-usage bar, `5h` / `7d` rate-limit gauges, git branch. Missing data drops a segment and
   any uncaught failure prints the model name alone — a status line that throws leaves the prompt blank, so preserve
