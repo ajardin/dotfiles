@@ -44,23 +44,33 @@ README explains **why** each choice is made, not just what it does.
 
 ## `statusline.py`
 
-Shows the model name, the effort level, a 10-cell context-usage bar and the current git branch. The point is the
-thresholds:
+One line, segments separated by `·`: model name, effort level, context-usage bar, plan rate-limit
+gauges, current git branch. Missing data drops a segment rather than breaking the line, and any
+uncaught failure falls back to printing the model name alone. A status line that throws leaves the
+prompt blank, so this one never throws.
 
-- **Green** below 60% / 160k tokens — safe zone.
-- **Yellow** at 60% or 160k tokens — early warning that auto-compact is approaching.
-- **Red** above 80% or once `exceeds_200k_tokens` flips — quality degrades and Claude Code is about to compact. Time
-  to wrap the task up or split the conversation.
+The thresholds are the part worth knowing. They apply to the context bar and the rate-limit gauges
+alike:
 
-The 160k yellow threshold is deliberately below the 200k compaction trigger so there is room to react before context
-gets pruned.
+- **Green** below 60%.
+- **Yellow** at 60%, early enough to react before context gets pruned.
+- **Red** at 80%. Quality degrades and compaction is close. Time to wrap the task up or split the
+  conversation.
 
-A second segment shows **plan usage**: on a Claude.ai Pro/Max session the JSON exposes `rate_limits.five_hour` and
-`rate_limits.seven_day`, so the line shows `Plan: 5h X% · 7d Y%` colored by the worst of the two (same green/yellow/
-red thresholds as the context bar). When `rate_limits` is absent (API-key billing, or pre-first-response on Max), it
-falls back to `Cost: $X.XX` from `cost.total_cost_usd`. The doc is explicit that this cost is a *client-side
-estimate* and may differ from actual billing — meaningful as a sanity check on API key, purely informational on Max.
-The single script handles both laptops without branching on hostname.
+The context segment takes `used_percentage` from the payload and appends the raw figures
+(`total_input_tokens` / `context_window_size`), so it stays correct whatever context window the
+model has. Before the first response `used_percentage` is absent, and the segment reads
+`Context: Ready`.
+
+Two rate-limit gauges follow, `5h` and `7d`, from `rate_limits.five_hour` and
+`rate_limits.seven_day`. A Claude.ai Pro/Max session carries them; API-key billing does not, and
+the gauges disappear. Each gauge takes its own color and its own `↻` countdown to reset. Past that
+reset the payload keeps serving the pre-reset figure until an API response refreshes it, so the
+script dims the gauge and flags it `stale` instead of coloring a number it knows is wrong.
+
+The branch comes from reading `.git/HEAD` directly rather than shelling out to `git`. The status
+line runs on every refresh, and it has to work from a worktree or submodule, where `.git` is a file
+instead of a directory.
 
 ## Plugins
 

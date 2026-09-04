@@ -2,7 +2,6 @@
 command = /opt/homebrew/bin/fish
 
 shell-integration-features = cursor,sudo,title,ssh-env,ssh-terminfo,path
-cursor-click-to-move = true
 
 # ─── Working directory ──────────────────────────────────────────────
 working-directory = home
@@ -31,7 +30,6 @@ window-save-state = always
 macos-titlebar-style = tabs
 
 # ─── Quick terminal ─────────────────────────────────────────────────
-quick-terminal-position = top
 quick-terminal-size = 40%
 
 # ─── Scrolling and selection ────────────────────────────────────────

@@ -10,6 +10,7 @@ Personal macOS dotfiles. Each top-level directory (`claude/`, `git/`, `homebrew/
 
 ```bash
 make help        # default target — list all targets with descriptions
+make check       # verify every deployed symlink still points back into this repo
 make claude      # symlink claude/ files into ~/.claude/
 make git         # symlink git/ files into ~/ (also touches ~/.gitconfig-corporate)
 make homebrew    # install Homebrew if missing, then `brew bundle install` from homebrew/Brewfile

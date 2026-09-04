@@ -1,3 +1,4 @@
+tap "ajardin/tap"
 tap "homebrew/bundle"
 tap "homebrew/services"
 
@@ -88,6 +89,8 @@ cask "ghostty"
 cask "gpg-suite"
 # JetBrains tools manager
 cask "jetbrains-toolbox"
+# GitHub pull request dashboard for the terminal
+cask "kiroshi"
 # Online collaborative whiteboard platform
 cask "miro"
 # Knowledge base that works on top of a local folder of plain text Markdown files

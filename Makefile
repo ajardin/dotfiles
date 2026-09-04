@@ -7,6 +7,42 @@
 makefile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 makefile_directory := $(realpath $(dir $(makefile_path)))
 
+check: ## Verifies that every deployed symlink points back to this repository
+	@status=0; \
+	verify() { \
+		if [ "$$(readlink "$$2" 2> /dev/null)" = "$$1" ]; then \
+			printf "  \033[32mok\033[0m    %s\n" "$$2"; \
+		elif [ -L "$$2" ]; then \
+			printf "  \033[31mwrong\033[0m %s -> %s\n" "$$2" "$$(readlink "$$2")"; status=1; \
+		elif [ -e "$$2" ]; then \
+			printf "  \033[31mfile\033[0m  %s (not a symlink)\n" "$$2"; status=1; \
+		else \
+			printf "  \033[33mmiss\033[0m  %s\n" "$$2"; status=1; \
+		fi; \
+	}; \
+	verify "${makefile_directory}/claude/settings.json" "${HOME}/.claude/settings.json"; \
+	verify "${makefile_directory}/claude/statusline.py" "${HOME}/.claude/statusline.py"; \
+	verify "${makefile_directory}/claude/global.md" "${HOME}/.claude/CLAUDE.md"; \
+	verify "${makefile_directory}/claude/RTK.md" "${HOME}/.claude/RTK.md"; \
+	verify "${makefile_directory}/claude/hooks/rtk-rewrite.sh" "${HOME}/.claude/hooks/rtk-rewrite.sh"; \
+	verify "${makefile_directory}/claude/hooks/command-history.sh" "${HOME}/.claude/hooks/command-history.sh"; \
+	verify "${makefile_directory}/git/.gitconfig" "${HOME}/.gitconfig"; \
+	verify "${makefile_directory}/git/.gitconfig-opensource" "${HOME}/.gitconfig-opensource"; \
+	verify "${makefile_directory}/git/.gitignore" "${HOME}/.gitignore"; \
+	verify "${makefile_directory}/terminal/ghostty/config.ghostty" "${HOME}/.config/ghostty/config.ghostty"; \
+	verify "${makefile_directory}/terminal/fish/config.fish" "${HOME}/.config/fish/config.fish"; \
+	for file in ${makefile_directory}/terminal/fish/functions/*.fish; do \
+		verify "$$file" "${HOME}/.config/fish/functions/$$(basename $$file)"; \
+	done; \
+	verify "${makefile_directory}/terminal/starship/starship.toml" "${HOME}/.config/starship.toml"; \
+	if [ -f "${HOME}/.gitconfig-corporate" ]; then \
+		printf "  \033[32mok\033[0m    %s\n" "${HOME}/.gitconfig-corporate"; \
+	else \
+		printf "  \033[33mmiss\033[0m  %s\n" "${HOME}/.gitconfig-corporate"; status=1; \
+	fi; \
+	exit $$status
+.PHONY: check
+
 claude: ## Deploys the Claude configuration files
 	mkdir -p "${HOME}/.claude/hooks"
 	ln -sf "${makefile_directory}/claude/settings.json" "${HOME}/.claude/settings.json"

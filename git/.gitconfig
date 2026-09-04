@@ -40,9 +40,6 @@
 [init]
     defaultBranch = main
 
-[interactive]
-    diffFilter = delta --color-only
-
 [merge]
     conflictstyle = diff3
 
