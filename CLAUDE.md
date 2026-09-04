@@ -35,14 +35,19 @@ Targets are independent and idempotent (re-running re-creates symlinks). There i
   this per-repo `CLAUDE.md`. It imports `@RTK.md`, then locks replies to English whatever language the user writes in
   (explicitly *not* content written for others — a PR description or a review comment follows its own audience), and
   adds two standing bans: never run SQL directly, and never open a credential file (the ban is stated for `Grep`,
-  `Bash` and subagents too, since the `Read` deny rules in `settings.json` only bind one tool).
+  `Bash` and subagents too, since the `Read` deny rules in `settings.json` only bind one tool). Between the language
+  rule and those bans sit four working rules — `Evidence before claims`, `Scope`, `Handoffs`, `Third-party facts` —
+  each derived from a logged failure in the May-September 2026 usage reports. `claude/README.md` records which
+  incident produced which rule, so read it before reworking one.
 - `claude` target deploys one hook only (`command-history.sh`) and `rm -f`s the stale
   `~/.claude/hooks/rtk-rewrite.sh` left by earlier deployments, since RTK's hook is now the binary's own
   `rtk hook claude` and needs no file. Drop that `rm -f` once no machine still carries the old symlink.
 - `claude` target also symlinks every directory under `claude/skills/` into `~/.claude/skills/`. These are
   **directory** symlinks, so the recipe uses `ln -sfn` (without `-n`, a second run would nest the new link inside the
   existing one). Adding a directory there and re-running `make claude` is enough to wire it up; `make check` picks it
-  up through the same glob.
+  up through the same glob. That glob runs one way only: `check` iterates the repo and asks whether each skill has a
+  symlink, so a real directory dropped straight into `~/.claude/skills/` is invisible to it. Such a skill works on that
+  machine and exists nowhere else — `ls -la ~/.claude/skills/` is the only way to spot one.
 - `claude/skills/` mixes two kinds of skill, and the difference matters when editing. The **vendored** ones are
   exactly those named in the `Makefile`'s `skills_list` (currently the six from `mattpocock/skills`); everything
   else — `squad-env-branch` today — is hand-written and owned here. `squad-env-branch` carries no hardcoded repo,
@@ -107,3 +112,7 @@ the same commit.
   adding entries.
 - Fish functions in `terminal/fish/functions/` follow the one-function-per-file convention required by fish's
   autoloader; the filename must match the function name.
+- Every Markdown file wraps at 120 columns.
+- Commit messages are a single imperative sentence in sentence case, no body, no prefix or scope tag ("Vendor upstream
+  Claude skills and add a sync target"). No attribution trailer: `attribution` in `settings.json` is emptied on
+  purpose, so strip any `Co-Authored-By` or session footer a tool tries to append.

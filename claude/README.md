@@ -54,6 +54,35 @@ The four keys below are recorded as *what*, not *why* — fill in the rationale 
 - **`outputStyle: "Concise"`** — answers lead with the result and drop preamble, narration and closing recaps.
   (*What*, not *why* — rationale to fill in.)
 
+## `global.md`
+
+Symlinked to `~/.claude/CLAUDE.md` — Claude Code requires that filename in `~/.claude/`, and the repo source is named
+`global.md` so it is never confused with this repo's own `CLAUDE.md`. It imports `@RTK.md`, then holds the rules that
+apply to every project on every machine.
+
+`Language` locks replies to English whatever language the prompt is in, explicitly *not* content written for others:
+a PR description or a review comment follows its own audience.
+
+`Database access` and `Credential files` are the two standing bans. They are stated for `Grep`, `Bash` and subagents
+too, because the `permissions.deny` rules above only bind `Read`.
+
+The four rules in between came out of the May-September 2026 usage reports across both machines, where
+*wrong approach* was the top friction category on each side. Every incident behind them is on record:
+
+- **`Evidence before claims`** — the recurring failure is asserting a conclusion from partial evidence. A Ghostty
+  config was flagged "never loaded" and the finding had to be retracted; a config line was proposed that was already the
+  tool's default; a skill sitting on disk was declared not installed on the strength of a session listing.
+  Splitting output into proven findings and a `Hypotheses` heading turns those two-round exchanges into one.
+- **`Scope`** — two failures that look opposite and are the same missing instruction. Unrequested work arrived (a
+  severity chart, extra tests, two different error shapes for one auth guard) while requested work was declined on
+  invented scope grounds. The rule states both directions so neither needs re-asking.
+- **`Handoffs`** — a data-import session stalled on "awaiting your validation", which needed a whole clarification
+  exchange to decode. A numbered decision list is actionable; that phrase is not.
+- **`Third-party facts`** — a Spotify for Artists pitch was built on invented styles, cultures and moods, every one
+  discarded once real screenshots arrived. `context7` covers library docs, not product UIs, so this rule covers the
+  gap. Written against any external service's vocabulary rather than that one incident's field names, so it holds for
+  an unfamiliar API or CLI just as well.
+
 ## `statusline.py`
 
 Wired through `statusLine` in `settings.json`: `python3 ~/.claude/statusline.py`, `refreshInterval: 60`.
