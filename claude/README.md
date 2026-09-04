@@ -134,10 +134,38 @@ installed repo by repo. Two kinds live side by side, and the distinction is the 
   after a `make skills-sync` *is* the upstream changelog — the moment one is edited locally, that property is gone
   and every later sync becomes a conflict to hand-resolve. Adapting one means forking it under a new name and
   dropping the original from `skills_list`.
-- **Owned** — everything else, `squad-env-branch` today. Written here, maintained here.
+- **Owned** — everything else: `squad-env-branch` and `memory-curate` today. Written here, maintained here.
 
 `grill-with-docs` and `wait-what` carry `disable-model-invocation: true` upstream: they are `/`-only, deliberately
-never auto-triggered.
+never auto-triggered. `memory-curate` sets the same flag for a different reason — see below.
+
+### `memory-curate`
+
+Rebuilds the current project's auto-memory directory (`~/.claude/projects/<project>/memory/`) from its session
+transcripts. It exists because the feature that would do this automatically is out of reach: Claude Code carries a
+local **auto-dream** pass, but `/memory` renders its `Auto-dream:` row only behind a server-side capability check,
+and on 2.1.260 (2026-09-04) the row is absent here — auto-memory is on, auto-dream is not offered. Setting
+`autoDreamEnabled` in `settings.json` would not help: the binary resolves that toggle *behind* the same gate, so the
+key is inert until the rollout reaches the account. Do not add it. Re-check by running `/memory` and looking for the
+row, not by reading settings.
+
+The design is lifted from Anthropic's [Dreams](https://platform.claude.com/docs/en/managed-agents/dreams), which is a
+*different* feature — a Managed Agents API job over `memstore_…` stores and API sessions, research-preview and
+behind a request-access form. It never touches a local memory directory, so getting access to it would not curate
+anything here. What transfers is its contract: read the store alongside past transcripts, write a **separate**
+output, and leave the input untouched so the result can be reviewed or discarded. The skill writes a
+`memory.candidate-<ts>/` sibling and swaps it in only on approval, because `MEMORY.md` loads into every session and
+a run dying halfway through an in-place rewrite would poison every session after it.
+
+Signal comes from real user turns only, pulled out with `jq` (`.type == "user"`, no `isMeta`, no `isSidechain`,
+string content, nothing opening on `<`). That last clause is doing more than it looks: `isMeta` does not catch
+`<command-name>`, `<command-message>`, `<local-command-stdout>` or `<task-notification>`, which all reach the
+transcript as ordinary user turns. Cost is the point — this project's 13 transcripts total 7.9 MB, and the filter
+reduces them to 25 prompts. Reading the transcripts whole is what it exists to avoid.
+
+`disable-model-invocation: true` is deliberate here: the skill rewrites the directory that shapes every future
+session, so it fires when you type `/memory-curate` and never on the model's own initiative. The cost is that you
+have to remember it exists — this section is that reminder.
 
 ## Plugins
 

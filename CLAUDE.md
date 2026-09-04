@@ -57,9 +57,11 @@ Targets are independent and idempotent (re-running re-creates symlinks). There i
   machine and exists nowhere else — `ls -la ~/.claude/skills/` is the only way to spot one.
 - `claude/skills/` mixes two kinds of skill, and the difference matters when editing. The **vendored** ones are
   exactly those named in the `Makefile`'s `skills_list` (currently the six from `mattpocock/skills`); everything
-  else — `squad-env-branch` today — is hand-written and owned here. `squad-env-branch` carries no hardcoded repo,
-  org or author: it derives them from `gh` and reads its squad roster from a per-repo
-  `.claude/squad-env-branch.json`, asking for it when that file is missing.
+  else — `squad-env-branch` and `memory-curate` today — is hand-written and owned here. Neither carries a hardcoded
+  path, repo, org or author: `squad-env-branch` derives them from `gh` and reads its squad roster from a per-repo
+  `.claude/squad-env-branch.json`, asking for it when that file is missing; `memory-curate` takes the auto-memory
+  directory from the `# Memory` section of the running system prompt, falling back to `CLAUDE_CONFIG_DIR` and the
+  git toplevel, so a project-scoped `autoMemoryDirectory` is honoured without being restated.
 - `skills-sync` target re-vendors the `skills_list` directories **verbatim** from `github.com/mattpocock/skills` (see
   the `skills_repo` / `skills_cache` / `skills_list` variables at the top of the `Makefile`). It keeps a blobless
   clone under `~/.cache/dotfiles/` and `rsync --delete`s each selected skill directory over its local copy, excluding
