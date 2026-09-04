@@ -85,6 +85,11 @@ Targets are independent and idempotent (re-running re-creates symlinks). There i
   enough to wire it up. The Ghostty (`terminal/ghostty/config.ghostty` → `~/.config/ghostty/`) and Starship
   (`terminal/starship/starship.toml` → `~/.config/starship.toml`) symlinks are explicit, so a new file in either
   directory has to be added to the recipe by hand.
+- The terminal files assume **Apple Silicon**: `config.fish` and `functions/sed.fish` call
+  `/opt/homebrew/…` by absolute path rather than resolving Homebrew from `PATH`. Deliberate — the prefix is what
+  bootstraps `PATH` in the first place — but it is the one thing to change on an Intel Mac, where it is
+  `/usr/local/…`. In `config.fish` only the Starship prompt sits inside `status is-interactive`; the environment
+  variables and `PATH` stay outside it, because fish scripts need them too.
 
 ## Claude Code integration
 
@@ -104,7 +109,8 @@ are load-bearing:
 - **Status line** (`claude/statusline.py`) reads the status-line JSON from stdin and prints one `·`-separated line:
   model, effort level, context-usage bar, `5h` / `7d` rate-limit gauges, git branch. Missing data drops a segment and
   any uncaught failure prints the model name alone — a status line that throws leaves the prompt blank, so preserve
-  that when editing.
+  that when editing. Each segment is also built behind its own `try`, so a malformed field costs only that segment;
+  keep new segments inside the loop in `build_status` rather than appending to `parts` directly.
 
 `enabledPlugins` and `extraKnownMarketplaces` in `settings.json` pin the user's plugin set — adding a plugin here is
 the canonical way to enable it system-wide.

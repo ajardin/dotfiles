@@ -130,39 +130,54 @@ def model_name(data: dict) -> str:
     return (data.get("model") or {}).get("display_name") or "Claude"
 
 
-def build_status(data: dict) -> str:
-    parts = [model_name(data)]
+def effort_segment(data: dict) -> str | None:
+    return (data.get("effort") or {}).get("level") or None
 
-    level = (data.get("effort") or {}).get("level")
-    if level:
-        parts.append(level)
 
+def context_segment(data: dict) -> str | None:
     ctx = data.get("context_window") or {}
     pct = ctx.get("used_percentage")
     if pct is None:
-        parts.append("Context: Ready")
-    else:
-        pct = int(round(pct))
-        # total_input_tokens is the payload's own sum of input + cache creation + cache read.
-        used = ctx.get("total_input_tokens") or 0
-        total = ctx.get("context_window_size") or 0
-        c = usage_color(pct)
-        seg = f"Context: {c}{bar(pct)} {pct:d}%{RESET}"
-        if used:
-            # No assumed window: a guessed total would contradict the percentage beside it.
-            raw = f"{fmt_tokens(used)}/{fmt_tokens(total)}" if total else fmt_tokens(used)
-            seg += f" {DIM}{raw}{RESET}"
-        parts.append(seg)
+        return "Context: Ready"
+    pct = int(round(pct))
+    # total_input_tokens is the payload's own sum of input + cache creation + cache read.
+    used = ctx.get("total_input_tokens") or 0
+    total = ctx.get("context_window_size") or 0
+    c = usage_color(pct)
+    seg = f"Context: {c}{bar(pct)} {pct:d}%{RESET}"
+    if used:
+        # No assumed window: a guessed total would contradict the percentage beside it.
+        raw = f"{fmt_tokens(used)}/{fmt_tokens(total)}" if total else fmt_tokens(used)
+        seg += f" {DIM}{raw}{RESET}"
+    return seg
 
+
+def rate_limit_segments(data: dict) -> list[str]:
     rl = data.get("rate_limits") or {}
-    for label, key in (("5h", "five_hour"), ("7d", "seven_day")):
-        g = gauge(label, rl.get(key) or {})
-        if g:
-            parts.append(g)
+    return [g for label, key in (("5h", "five_hour"), ("7d", "seven_day"))
+            if (g := gauge(label, rl.get(key) or {}))]
 
+
+def branch_segment(data: dict) -> str | None:
     branch = git_branch((data.get("workspace") or {}).get("current_dir") or data.get("cwd"))
-    if branch:
-        parts.append(f"{DIM}⎇{RESET} {branch}")
+    return f"{DIM}⎇{RESET} {branch}" if branch else None
+
+
+def build_status(data: dict) -> str:
+    parts = [model_name(data)]
+
+    # Guarded one by one: a malformed field costs its own segment, never the whole line.
+    # Without this, something like a non-numeric "resets_at" would drop the context bar and
+    # the branch too, leaving the model name alone.
+    for segment in (effort_segment, context_segment, rate_limit_segments, branch_segment):
+        try:
+            value = segment(data)
+        except Exception:
+            continue
+        if isinstance(value, list):
+            parts.extend(value)
+        elif value:
+            parts.append(value)
 
     return SEP.join(parts)
 

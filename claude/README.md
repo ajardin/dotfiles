@@ -92,6 +92,12 @@ gauges, current git branch. Missing data drops a segment rather than breaking th
 uncaught failure falls back to printing the model name alone. A status line that throws leaves the
 prompt blank, so this one never throws.
 
+*Malformed* data is guarded separately from missing data, and each segment is built behind its own
+`try`. Before that, one bad field took the whole line down with it: a `resets_at` arriving as an
+ISO-8601 string instead of an epoch raised inside the gauge, and the outer fallback then printed the
+model name alone — losing the context bar and the branch, which were both perfectly computable. Now
+only the offending segment disappears.
+
 The thresholds are the part worth knowing. They apply to the context bar and the rate-limit gauges
 alike:
 
