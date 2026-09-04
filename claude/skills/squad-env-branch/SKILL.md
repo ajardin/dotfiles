@@ -13,7 +13,7 @@ ready to inspect, and you decide what happens next.
 
 ## Argument
 
-`%ARGUMENTS` may carry the name of the branch to create. Otherwise default to
+`$ARGUMENTS` may carry the name of the branch to create. Otherwise default to
 `deploy/squad-<YYYY-MM-DD>`.
 
 ## Configuration
@@ -41,13 +41,16 @@ Resolve both into the variables the rest of this skill uses:
 CONFIG=".claude/squad-env-branch.json"
 AUTHORS="$(jq -r '.authors[]?' "$CONFIG" 2> /dev/null | tr '\n' ' ')"
 TEAM="$(jq -r '.team // empty' "$CONFIG" 2> /dev/null)"
-[ -n "$AUTHORS" ] || [ -z "$TEAM" ] || AUTHORS="$(gh api "/orgs/${TEAM%/*}/teams/${TEAM##*/}/members" -q '.[].login' | tr '\n' ' ')"
+if [ -z "$AUTHORS" ] && [ -n "$TEAM" ]; then
+  case "$TEAM" in
+    */*) TEAM_ORG="${TEAM%/*}" ;;                              # "org/slug"
+    *)   TEAM_ORG="$(gh repo view --json owner -q .owner.login)" ;;  # bare "slug": the repo's owner
+  esac
+  AUTHORS="$(gh api "/orgs/${TEAM_ORG}/teams/${TEAM##*/}/members" -q '.[].login' | tr '\n' ' ')"
+fi
 BASE="$(jq -r '.base // empty' "$CONFIG" 2> /dev/null)"
 BASE="${BASE:-$(gh repo view --json defaultBranchRef -q .defaultBranchRef.name)}"
 ```
-
-A bare `slug` leaves `${TEAM%/*}` equal to the slug itself, so pass the owner org from
-`gh repo view --json owner -q .owner.login` in that case.
 
 **With an empty `$AUTHORS`**, ask which logins to integrate, run the flow with the answer, then
 offer to write the file so the next run in this repository needs no question. Never guess a roster
