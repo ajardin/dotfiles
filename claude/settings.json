@@ -10,11 +10,11 @@
       "Bash(docker compose ps)",
       "Bash(docker compose ps *)",
       "Bash(docker compose config *)",
-      "mcp__datadog-mcp__search_datadog_logs",
-      "mcp__datadog-mcp__search_datadog_metrics",
-      "mcp__datadog-mcp__get_datadog_incident",
-      "mcp__datadog-mcp__load_datadog_skill",
-      "mcp__atlassian__getJiraIssue"
+      "mcp__claude_ai_Datadog__search_datadog_logs",
+      "mcp__claude_ai_Datadog__search_datadog_metrics",
+      "mcp__claude_ai_Datadog__get_datadog_incident",
+      "mcp__claude_ai_Datadog__load_datadog_skill",
+      "mcp__claude_ai_Atlassian_Rovo__getJiraIssue"
     ],
     "deny": [
       "Read(/**/.env)",
@@ -37,7 +37,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/rtk-rewrite.sh"
+            "command": "rtk hook claude"
           }
         ]
       }

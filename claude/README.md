@@ -24,14 +24,24 @@ README explains **why** each choice is made, not just what it does.
 - **`cleanupPeriodDays: 90`** — a quarter of transcript history: long enough to revisit recent work, short enough to
   keep disk usage bounded.
 
+The four keys below are recorded as *what*, not *why* — fill in the rationale when you next touch them.
+
+- **`theme: "dark-ansi"`** — terminal ANSI colours rather than a fixed palette.
+- **`autoContinueAtUsageLimit: true`** — an interrupted turn resumes on its own once the usage window resets.
+- **`agentPushNotifEnabled: true`** — push notification when a background agent finishes.
+- **`skipWorkflowUsageWarning: true`** — suppresses the token-cost warning on the `Workflow` tool.
+
 ### Safety
 
-- **`permissions.deny`** — defense-in-depth against accidental reads of `.env`, `.pem`, `.key`, `secrets/` in
-  projects, plus home-directory credentials (`~/.ssh`, `~/.aws`, `~/.gnupg`).
+- **`permissions.deny`** — defense-in-depth against accidental reads of `.env`, `.env.*`, `credentials.json`,
+  `.pem`, `.key` and `secrets/` in projects, plus home-directory credentials (`~/.ssh`, `~/.aws`, `~/.gnupg`).
   Belt-and-suspenders alongside `.gitignore`: an agent should not be able to ingest these files even if asked.
+  The rules bind `Read` only, which is exactly why `global.md` restates the ban for `Grep`, `Bash` and subagents.
 - **`permissions.allow`** — short allowlist of read-only commands observed in real transcripts (`docker compose ps`,
-  a few Datadog/Jira MCP read tools). Reduces prompt fatigue without granting anything that mutates state or
-  executes arbitrary code — `docker exec`, `rtk proxy`, `gh api *` and the like stay out on purpose.
+  `docker compose config`, a few Datadog/Jira MCP read tools). Reduces prompt fatigue without granting anything that
+  mutates state or executes arbitrary code — `docker exec`, `rtk proxy`, `gh api *` and the like stay out on purpose.
+  MCP rules are keyed on the *server* name as configured, so a renamed or re-added connector silently stops matching;
+  check the entries against `claude mcp list` when prompts reappear for a tool that used to be allowed.
 - **`disableBypassPermissionsMode: "disable"`** — bypass mode skips all permission checks. Disabling it ensures
   sensitive operations always prompt, even under time pressure.
 - **`skipAutoPermissionPrompt: true`** — the explicit `deny` rules above already gate the dangerous reads; extra
@@ -41,8 +51,12 @@ README explains **why** each choice is made, not just what it does.
 
 - **`attribution: { commit: "", pr: "" }`** — strips "Generated with Claude Code" footers from commits and PRs.
   Authorship belongs to the human, not the tool.
+- **`outputStyle: "Concise"`** — answers lead with the result and drop preamble, narration and closing recaps.
+  (*What*, not *why* — rationale to fill in.)
 
 ## `statusline.py`
+
+Wired through `statusLine` in `settings.json`: `python3 ~/.claude/statusline.py`, `refreshInterval: 60`.
 
 One line, segments separated by `·`: model name, effort level, context-usage bar, plan rate-limit
 gauges, current git branch. Missing data drops a segment rather than breaking the line, and any
@@ -60,7 +74,9 @@ alike:
 The context segment takes `used_percentage` from the payload and appends the raw figures
 (`total_input_tokens` / `context_window_size`), so it stays correct whatever context window the
 model has. Before the first response `used_percentage` is absent, and the segment reads
-`Context: Ready`.
+`Context: Ready`. The percentage is the authoritative half: when the payload omits
+`context_window_size`, the used figure is printed alone rather than divided by an assumed window,
+which would print a ratio contradicting the bar right beside it.
 
 Two rate-limit gauges follow, `5h` and `7d`, from `rate_limits.five_hour` and
 `rate_limits.seven_day`. A Claude.ai Pro/Max session carries them; API-key billing does not, and
@@ -71,6 +87,22 @@ script dims the gauge and flags it `stale` instead of coloring a number it knows
 The branch comes from reading `.git/HEAD` directly rather than shelling out to `git`. The status
 line runs on every refresh, and it has to work from a worktree or submodule, where `.git` is a file
 instead of a directory.
+
+## Skills (`skills/`)
+
+Every directory here is symlinked into `~/.claude/skills/`, so a skill is available in every project without being
+installed repo by repo. Two kinds live side by side, and the distinction is the whole point:
+
+- **Vendored** — the directories named in the `Makefile`'s `skills_list`, currently six from
+  [`mattpocock/skills`](https://github.com/mattpocock/skills). Vendoring rather than installing means the versions in
+  use are pinned, reviewable and offline. They are kept **byte-for-byte upstream** so `git diff -- claude/skills`
+  after a `make skills-sync` *is* the upstream changelog — the moment one is edited locally, that property is gone
+  and every later sync becomes a conflict to hand-resolve. Adapting one means forking it under a new name and
+  dropping the original from `skills_list`.
+- **Owned** — everything else, `squad-env-branch` today. Written here, maintained here.
+
+`grill-with-docs` and `wait-what` carry `disable-model-invocation: true` upstream: they are `/`-only, deliberately
+never auto-triggered.
 
 ## Plugins
 
@@ -91,23 +123,32 @@ repo by repo.
   versions.
 - **`frontend-design`** — frontend scaffolding skill with some visual polish, used occasionally.
 
-## RTK (`RTK.md`, `hooks/rtk-rewrite.sh`)
+## RTK (`RTK.md`)
 
 [RTK](https://github.com/rtk-ai/rtk) is a CLI proxy that rewrites verbose commands into token-efficient equivalents
-(e.g. `git status` → `rtk git status`). The PreToolUse hook `claude/hooks/rtk-rewrite.sh` intercepts every `Bash`
-call and delegates to `rtk rewrite` for the decision (substitute, pass through, deny, or prompt).
+(e.g. `git status` → `rtk git status`). The PreToolUse hook is `rtk hook claude` — a subcommand of the binary, wired
+straight into `settings.json`. Nothing repo-side implements it.
 
 Why bother:
 
 - **Cost.** A `git log` or `find` dump can burn thousands of tokens the model doesn't need. RTK trims the noise at
   the source — claimed 60-90% savings on common dev operations.
 - **Quality.** Less noise in context = more room for the actual problem, so better reasoning per turn.
-- **Transparency.** The hook is deliberately minimal: all rewrite rules live in the Rust binary, so the model
-  doesn't need to know which commands get rewritten. `RTK.md` (imported via `@RTK.md` from `global.md`) only
-  documents the meta-commands (`rtk gain`, `rtk discover`) the model must call explicitly.
+- **Transparency.** All rewrite rules live in the Rust binary, so the model doesn't need to know which commands get
+  rewritten. `RTK.md` (imported via `@RTK.md` from `global.md`) only documents the meta-commands (`rtk gain`,
+  `rtk discover`) the model must call explicitly.
 
-The exit-code contract (`0` allow, `1` passthrough, `2` deny, `3` ask) is the integration boundary; everything else
-lives inside `rtk` itself, which keeps repo-side logic out of this dotfiles tree.
+The hook reads `permissions` from `settings.json`: an allowlisted command is rewritten *and* auto-allowed, a denied
+one passes through untouched, anything else is rewritten and still prompts. So the allowlist above is what decides
+whether RTK saves a prompt as well as tokens.
+
+The cost of using the binary's hook rather than the shell one upstream also ships: no `command -v rtk` guard, so a
+machine without rtk gets a failing hook on every `Bash` call instead of a silent no-op. `brew "rtk"` is in the
+Brewfile. `rtk init --show`, `rtk hook check '<cmd>'` and `rtk verify` diagnose it.
+
+`RTK.md` is **vendored**, not written here: `rtk init --global` output in slim mode, re-generated by
+`make rtk-sync`, same discipline as the skills. Its dangling last line is upstream's, kept verbatim so syncs
+stay clean.
 
 ## Command history (`hooks/command-history.sh`)
 

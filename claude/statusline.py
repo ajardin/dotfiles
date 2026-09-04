@@ -23,10 +23,10 @@ DIM = "\033[2m"
 SEP = f" {DIM}·{RESET} "
 
 BAR_LENGTH = 10
-# Usage thresholds (%), tuned around the 200k-token auto-compact boundary.
+# Usage thresholds, in percent, so they hold whatever the context window. Shared by the
+# context bar and the rate-limit gauges: for both, a higher percentage is worse.
 WARN_PCT = 60
 DANGER_PCT = 80
-DEFAULT_CONTEXT_WINDOW = 200_000
 
 
 def fmt_tokens(n: float | None) -> str:
@@ -145,11 +145,13 @@ def build_status(data: dict) -> str:
         pct = int(round(pct))
         # total_input_tokens is the payload's own sum of input + cache creation + cache read.
         used = ctx.get("total_input_tokens") or 0
-        total = ctx.get("context_window_size") or DEFAULT_CONTEXT_WINDOW
+        total = ctx.get("context_window_size") or 0
         c = usage_color(pct)
         seg = f"Context: {c}{bar(pct)} {pct:d}%{RESET}"
         if used:
-            seg += f" {DIM}{fmt_tokens(used)}/{fmt_tokens(total)}{RESET}"
+            # No assumed window: a guessed total would contradict the percentage beside it.
+            raw = f"{fmt_tokens(used)}/{fmt_tokens(total)}" if total else fmt_tokens(used)
+            seg += f" {DIM}{raw}{RESET}"
         parts.append(seg)
 
     rl = data.get("rate_limits") or {}
