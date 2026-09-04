@@ -24,4 +24,5 @@ ehthumbs.db
 Thumbs.db
 
 **/.claude/settings.local.json
+**/.claude/squad-env-branch.json
 **/.claude/worktrees/
