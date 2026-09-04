@@ -39,6 +39,13 @@ Targets are independent and idempotent (re-running re-creates symlinks). There i
   rule and those bans sit four working rules — `Evidence before claims`, `Scope`, `Handoffs`, `Third-party facts` —
   each derived from a logged failure in the May-September 2026 usage reports. `claude/README.md` records which
   incident produced which rule, so read it before reworking one.
+- `claude` target refuses to run when any of its destinations in `~/.claude/` exists as a real file or directory
+  instead of a symlink, and deploys nothing until it is removed. The symlinks are deliberately the way an outside
+  edit becomes visible: a tool writing `~/.claude/settings.json` in place follows the link and lands in this
+  repository, where `git diff` catches it. A tool writing it *atomically* (temp file + `rename`) replaces the link
+  with a real file instead, and the unguarded `ln -sf` would then overwrite that with no diff to review — which is
+  how the `codebase-memory-mcp` hook registrations were lost. The guard covers the same destinations as `check`,
+  skills included.
 - `claude` target deploys one hook only (`command-history.sh`) and `rm -f`s the stale
   `~/.claude/hooks/rtk-rewrite.sh` left by earlier deployments, since RTK's hook is now the binary's own
   `rtk hook claude` and needs no file. Drop that `rm -f` once no machine still carries the old symlink.

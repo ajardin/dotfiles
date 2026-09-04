@@ -56,6 +56,21 @@ check: ## Verifies that every deployed symlink points back to this repository
 .PHONY: check
 
 claude: ## Deploys the Claude configuration files
+	@# A real file where a symlink belongs means something wrote to ~/.claude outside this
+	@# repository. An in-place write follows the symlink and shows up as a diff here, but an
+	@# atomic one (temp file + rename) replaces the link instead, and "ln -sf" below would
+	@# discard it without ever surfacing it. Stop and let it be reviewed.
+	@targets="settings.json statusline.py CLAUDE.md RTK.md hooks/command-history.sh"; \
+	for directory in ${makefile_directory}/claude/skills/*/; do \
+		targets="$$targets skills/$$(basename $$directory)"; \
+	done; \
+	for target in $$targets; do \
+		path="${HOME}/.claude/$$target"; \
+		if [ -e "$$path" ] && [ ! -L "$$path" ]; then \
+			printf "  \033[31mrefusing\033[0m %s is not a symlink — review it, then remove it\n" "$$path"; \
+			exit 1; \
+		fi; \
+	done
 	mkdir -p "${HOME}/.claude/hooks"
 	ln -sf "${makefile_directory}/claude/settings.json" "${HOME}/.claude/settings.json"
 	ln -sf "${makefile_directory}/claude/statusline.py" "${HOME}/.claude/statusline.py"
