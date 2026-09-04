@@ -7,6 +7,13 @@
 makefile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 makefile_directory := $(realpath $(dir $(makefile_path)))
 
+# Upstream of the vendored Claude skills, kept verbatim (see "skills-sync")
+skills_repo := https://github.com/mattpocock/skills.git
+skills_cache := ${HOME}/.cache/dotfiles/mattpocock-skills
+skills_list := engineering/grill-with-docs engineering/domain-modeling \
+               engineering/diagnosing-bugs productivity/grilling \
+               productivity/writing-for-agents productivity/wait-what
+
 check: ## Verifies that every deployed symlink points back to this repository
 	@status=0; \
 	verify() { \
@@ -26,6 +33,9 @@ check: ## Verifies that every deployed symlink points back to this repository
 	verify "${makefile_directory}/claude/RTK.md" "${HOME}/.claude/RTK.md"; \
 	verify "${makefile_directory}/claude/hooks/rtk-rewrite.sh" "${HOME}/.claude/hooks/rtk-rewrite.sh"; \
 	verify "${makefile_directory}/claude/hooks/command-history.sh" "${HOME}/.claude/hooks/command-history.sh"; \
+	for directory in ${makefile_directory}/claude/skills/*/; do \
+		verify "$${directory%/}" "${HOME}/.claude/skills/$$(basename $$directory)"; \
+	done; \
 	verify "${makefile_directory}/git/.gitconfig" "${HOME}/.gitconfig"; \
 	verify "${makefile_directory}/git/.gitconfig-opensource" "${HOME}/.gitconfig-opensource"; \
 	verify "${makefile_directory}/git/.gitignore" "${HOME}/.gitignore"; \
@@ -51,6 +61,10 @@ claude: ## Deploys the Claude configuration files
 	ln -sf "${makefile_directory}/claude/RTK.md" "${HOME}/.claude/RTK.md"
 	ln -sf "${makefile_directory}/claude/hooks/rtk-rewrite.sh" "${HOME}/.claude/hooks/rtk-rewrite.sh"
 	ln -sf "${makefile_directory}/claude/hooks/command-history.sh" "${HOME}/.claude/hooks/command-history.sh"
+	mkdir -p "${HOME}/.claude/skills"
+	for directory in ${makefile_directory}/claude/skills/*/; do \
+		ln -sfn "$${directory%/}" "${HOME}/.claude/skills/$$(basename $$directory)"; \
+	done
 .PHONY: claude
 
 git: ## Deploys the Git configuration files
@@ -67,6 +81,22 @@ homebrew: ## Installs Homebrew and the latest version of its packages
 	brew update && \
 	brew bundle install --file="${makefile_directory}/homebrew/Brewfile" --verbose
 .PHONY: homebrew
+
+skills-sync: ## Pulls the latest upstream version of the vendored Claude skills
+	@mkdir -p "$$(dirname ${skills_cache})"
+	@[ -d "${skills_cache}" ] || git clone --quiet --filter=blob:none --no-checkout "${skills_repo}" "${skills_cache}"
+	@git -C "${skills_cache}" fetch --quiet origin main
+	@paths=""; for skill in ${skills_list}; do paths="$$paths skills/$$skill"; done; \
+	git -C "${skills_cache}" checkout --quiet origin/main -- $$paths; \
+	for skill in ${skills_list}; do \
+		mkdir -p "${makefile_directory}/claude/skills/$$(basename $$skill)"; \
+		rsync --archive --delete --exclude="agents/" \
+			"${skills_cache}/skills/$$skill/" \
+			"${makefile_directory}/claude/skills/$$(basename $$skill)/"; \
+	done
+	@printf "Upstream revision: %s\n" "$$(git -C ${skills_cache} rev-parse --short origin/main)"
+	@echo "Review before committing: git diff -- claude/skills"
+.PHONY: skills-sync
 
 terminal: ## Deploys the configuration of the terminal
 	# Ghostty
