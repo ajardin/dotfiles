@@ -1,5 +1,11 @@
 @RTK.md
 
+# Language
+
+Answer me in English, always, whatever language I write in. This covers your replies to me,
+not content written for others: a PR description, a review comment or a doc follows its own
+audience, and a skill that sets its output language keeps it.
+
 # Database access
 
 Never run SQL yourself — this includes the PhpStorm MCP database tools
