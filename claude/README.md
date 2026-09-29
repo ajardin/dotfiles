@@ -134,7 +134,8 @@ installed repo by repo. Two kinds live side by side, and the distinction is the 
   after a `make skills-sync` *is* the upstream changelog — the moment one is edited locally, that property is gone
   and every later sync becomes a conflict to hand-resolve. Adapting one means forking it under a new name and
   dropping the original from `skills_list`.
-- **Owned** — everything else: `squad-env-branch` and `memory-curate` today. Written here, maintained here.
+- **Owned** — everything else: `squad-env-branch`, `memory-curate`, `ship-draft` and `address-review` today.
+  Written here, maintained here.
 
 `grill-with-docs` and `wait-what` carry `disable-model-invocation: true` upstream: they are `/`-only, deliberately
 never auto-triggered. `memory-curate` sets the same flag for a different reason — see below.
