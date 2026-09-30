@@ -9,7 +9,8 @@ makefile_directory := $(realpath $(dir $(makefile_path)))
 
 # Third-party Claude skills installed globally by the skills CLI (see "skills")
 skills_cli := skills@1.7.0
-skills_mattpocock := grill-with-docs domain-modeling diagnosing-bugs grilling writing-for-agents wait-what
+skills_mattpocock := improve-codebase-architecture codebase-design diagnosing-bugs grilling writing-for-agents \
+                     wait-what
 skills_cursor := unslop
 
 check: ## Verifies every deployed symlink, every third-party skill listed for "skills" and RTK.md
@@ -126,7 +127,7 @@ skills: ## Installs or updates the third-party Claude skills in ~/.claude/skills
 	@command -v npx > /dev/null || { echo "npx is not installed"; exit 1; }
 	@# "claude" used to symlink these skills from claude/skills/. The CLI must not write through such a link once its
 	@# directory is gone. The loop deletes links only, never the real directories the CLI installs.
-	@for skill in ${skills_mattpocock}; do \
+	@for skill in ${skills_mattpocock} domain-modeling grill-with-docs; do \
 		[ -L "${HOME}/.claude/skills/$$skill" ] && rm -f "${HOME}/.claude/skills/$$skill"; \
 	done; true
 	DISABLE_TELEMETRY=1 npx --yes ${skills_cli} add mattpocock/skills --global --agent claude-code --copy --yes \

@@ -145,10 +145,15 @@ reads it to confirm that each listed skill comes from the source its list names.
 from reporting installs. The pinned CLI version stops a new release from changing where or how the CLI writes skills
 between two runs.
 
-`grill-with-docs` and `wait-what` carry `disable-model-invocation: true` upstream, so only a `/` command runs them.
-`unslop` carries the flag too, although its own description says "Must always apply", so `make skills` deletes the
-line from the installed copy. [cursor/plugins#379](https://github.com/cursor/plugins/pull/379) removes it upstream and
-is still open. `memory-curate` sets the same flag for a different reason, explained below.
+`improve-codebase-architecture` and `wait-what` carry `disable-model-invocation: true` upstream, so only a `/` command
+runs them. `unslop` carries the flag too, although its own description says "Must always apply", so `make skills`
+deletes the line from the installed copy. [cursor/plugins#379](https://github.com/cursor/plugins/pull/379) removes it
+upstream and is still open. `memory-curate` sets the same flag for a different reason, explained below.
+
+`improve-codebase-architecture` calls `domain-modeling` to update `GLOSSARY.md` and the ADRs as the user makes
+decisions. `make skills` leaves `domain-modeling` out on purpose, because this setup keeps no glossary or ADRs. Those
+updates therefore never happen, and the skill does the scan, the report and the grilling loop only. `make skills`
+installs `codebase-design` because `improve-codebase-architecture` calls it for its architecture vocabulary.
 
 ### `memory-curate`
 
