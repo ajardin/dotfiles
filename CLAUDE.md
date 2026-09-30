@@ -13,12 +13,11 @@ been run at least once — no copy step.
 
 ```bash
 make help        # default target — list all targets with descriptions
-make check       # verify every deployed symlink still points back into this repo
-make claude      # symlink claude/ files into ~/.claude/
+make check       # verify every deployed symlink still points back into this repo, and every listed skill is installed
+make claude      # run `skills`, symlink claude/ files into ~/.claude/, then generate RTK.md with `rtk init`
 make git         # symlink git/ files into ~/ (also touches ~/.gitconfig-corporate)
 make homebrew    # install Homebrew if missing, then `brew bundle install` from homebrew/Brewfile
-make rtk-sync    # re-vendor claude/RTK.md from the installed rtk binary
-make skills-sync # re-vendor claude/skills/ from the upstream mattpocock/skills repo
+make skills      # install or update the third-party skills in ~/.claude/skills/ through the skills CLI
 make terminal    # symlink Ghostty config, fish config + functions, and Starship prompt
 ```
 
@@ -31,7 +30,7 @@ Targets are independent and idempotent (re-running re-creates symlinks). There i
   `.gitconfig-opensource` on top for repos under that path. The corporate file stays out of the repo so work-specific
   `user.email` / signing config can live there without leaking.
 - `claude` target symlinks `claude/global.md` to `~/.claude/CLAUDE.md` (Claude Code requires that filename in
-  `~/.claude/`) and `claude/RTK.md` into `~/.claude/`. The repo source is named `global.md` to avoid confusion with
+  `~/.claude/`). The repo source is named `global.md` to avoid confusion with
   this per-repo `CLAUDE.md`. It imports `@RTK.md`, then locks replies to English whatever language the user writes in
   (explicitly *not* content written for others — a PR description or a review comment follows its own audience), and
   adds two standing bans: never run SQL directly, and never open a credential file (the ban is stated for `Grep`,
@@ -44,42 +43,54 @@ Targets are independent and idempotent (re-running re-creates symlinks). There i
   edit becomes visible: a tool writing `~/.claude/settings.json` in place follows the link and lands in this
   repository, where `git diff` catches it. A tool writing it *atomically* (temp file + `rename`) replaces the link
   with a real file instead, and the unguarded `ln -sf` would then overwrite that with no diff to review — which is
-  how the `codebase-memory-mcp` hook registrations were lost. The guard covers the same destinations as `check`,
-  skills included.
+  how the `codebase-memory-mcp` hook registrations were lost. The guard covers the same symlinks as `check`,
+  owned skills included.
 - `claude` target deploys one hook only (`command-history.sh`) and `rm -f`s the stale
   `~/.claude/hooks/rtk-rewrite.sh` left by earlier deployments, since RTK's hook is now the binary's own
   `rtk hook claude` and needs no file. Drop that `rm -f` once no machine still carries the old symlink.
-- `claude` target also symlinks every directory under `claude/skills/` into `~/.claude/skills/`. These are
-  **directory** symlinks, so the recipe uses `ln -sfn` (without `-n`, a second run would nest the new link inside the
-  existing one). Adding a directory there and re-running `make claude` is enough to wire it up; `make check` picks it
-  up through the same glob. That glob runs one way only: `check` iterates the repo and asks whether each skill has a
-  symlink, so a real directory dropped straight into `~/.claude/skills/` is invisible to it. Such a skill works on that
-  machine and exists nowhere else — `ls -la ~/.claude/skills/` is the only way to spot one.
-- `claude/skills/` mixes two kinds of skill, and the difference matters when editing. The **vendored** ones are
-  exactly those named in the `Makefile`'s `skills_list` (currently the six from `mattpocock/skills`); everything
-  else — `squad-env-branch` and `memory-curate` today — is hand-written and owned here. Neither carries a hardcoded
-  path, repo, org or author: `squad-env-branch` derives them from `gh` and reads its squad roster from a per-repo
+- `claude` target also symlinks every directory under `claude/skills/` into `~/.claude/skills/`. These are **directory**
+  symlinks, so the recipe uses `ln -sfn` (without `-n`, a second run would nest the new link inside the existing one).
+  Adding a directory there and re-running `make claude` is enough to wire it up; `make check` picks it up through the
+  same glob. That glob runs one way only: `check` iterates the repo and asks whether each skill has a symlink. For the
+  real directories that the `skills` target installs, `check` works from the `Makefile` lists instead. It requires each
+  listed skill to be a real directory with a `SKILL.md`, and uses `jq` to confirm that `~/.agents/.skill-lock.json`
+  records it under the expected source. `check` cannot see a directory in `~/.claude/skills/` that is on neither list.
+  Such a skill works on that machine and exists nowhere else, and `ls -la ~/.claude/skills/` is the only way to spot
+  one.
+- `claude/skills/` holds only the skills written and owned here, today `squad-env-branch`, `memory-curate`, `ship-draft`
+  and `address-review`. The `skills` target installs the third-party ones. None of the owned skills hardcodes a path,
+  repo, org or author. `squad-env-branch` derives them from `gh` and reads its squad roster from a per-repo
   `.claude/squad-env-branch.json`, asking for it when that file is missing; `memory-curate` takes the auto-memory
-  directory from the `# Memory` section of the running system prompt, falling back to `CLAUDE_CONFIG_DIR` and the
-  git toplevel, so a project-scoped `autoMemoryDirectory` is honoured without being restated.
-- `skills-sync` target re-vendors the `skills_list` directories **verbatim** from `github.com/mattpocock/skills` (see
-  the `skills_repo` / `skills_cache` / `skills_list` variables at the top of the `Makefile`). It keeps a blobless
-  clone under `~/.cache/dotfiles/` and `rsync --delete`s each selected skill directory over its local copy, excluding
-  the skill's `agents/` folder (Codex-specific YAML). Because the rsync is per-skill, directories outside
-  `skills_list` are never touched. Vendored files are deliberately kept unmodified so `git diff -- claude/skills`
-  after a sync *is* the upstream changelog — do not edit them in place; if a vendored skill needs adapting, fork it
-  under a different name and drop the original from `skills_list`. Only a hand-picked subset is vendored — six today,
-  out of roughly 37 upstream skills spread across `engineering/`, `productivity/`, `in-progress/`, `misc/` and
-  `deprecated/`. The rest either duplicate the user's own skills, assume a GitHub-Issues-first tracker flow, or are
-  upstream's own work-in-progress. `skills_list` is the authoritative answer to "what is vendored"; upstream's tree is
-  the authoritative answer to "what exists".
-- `claude/RTK.md` is **vendored too** (`rtk init --global` slim-mode output) — same discipline as the skills: never
-  hand-edit, re-vendor with `make rtk-sync`, read `git diff -- claude/RTK.md` as the changelog. The gotcha: `rtk-sync`
-  runs `rtk init` under a **sandboxed `HOME` and `CLAUDE_CONFIG_DIR`** and copies only `RTK.md` out, because a real
-  `rtk init --global` also patches `settings.json` and `global.md`, writing *through* symlinks into tracked files.
-  Both variables are needed: rtk resolves its target from `CLAUDE_CONFIG_DIR` in preference to `$HOME/.claude`, so
-  overriding `HOME` alone leaves the live config exposed on a machine that exports it. Its dangling last line is
-  upstream's, kept verbatim on purpose — see `claude/README.md`.
+  directory from the `# Memory` section of the running system prompt, falling back to `CLAUDE_CONFIG_DIR` and the git
+  toplevel, so a project-scoped `autoMemoryDirectory` is honoured without being restated.
+- `skills` target installs the third-party skills with the `skills` CLI (`npx skills@1.7.0 add … --global --agent
+  claude-code --copy`). It runs one `add` per upstream repo, each with its own list, and `skills_mattpocock` and
+  `skills_cursor` at the top of the `Makefile` are the authoritative answer to "what is installed". The CLI finds a
+  skill by name, so nobody needs to know its path upstream (`pstack/skills/unslop`). The skills land as real directories
+  in `~/.claude/skills/`, not symlinks, and this repository does not version them. Re-running the target overwrites them
+  with upstream's current `main`, so the same target installs and updates. Nobody reviews an upstream change before it
+  goes live; the user accepts that cost in exchange for installing from several repositories.
+  `~/.agents/.skill-lock.json` records what each machine has (source, path, content hash), and git does not track it
+  either. The CLI also copies each skill's Codex-only `agents/` folder, which Claude Code does not use. The recipe sets
+  `DISABLE_TELEMETRY=1` and pins the CLI version on purpose. Like rtk, the CLI resolves its target from
+  `CLAUDE_CONFIG_DIR` in preference to `$HOME/.claude`. Before installing, the recipe deletes any symlink in
+  `~/.claude/skills/` named after a skill that `claude/skills/` used to vendor, so the CLI never writes through a
+  dangling link. Drop that loop once no machine still has such a link. After installing, the recipe deletes the
+  `disable-model-invocation: true` line from `unslop`'s `SKILL.md`, so Claude can pick the skill on its own, as its
+  description ("Must always apply") intends. [cursor/plugins#379](https://github.com/cursor/plugins/pull/379) makes the
+  same change upstream. Once it merges, the `sed` line does nothing and can go.
+- `claude` target depends on `skills`, so one `make claude` deploys everything under `~/.claude/`. Its last step runs
+  `rtk init --global --auto-patch`, which writes `~/.claude/RTK.md` as a real file. Like the skills, that file is
+  upstream's current output, untracked and unreviewed. The recipe runs rtk after the symlinks on purpose. rtk then finds
+  its hook in `settings.json` and the `@RTK.md` import in `global.md`, reports both as present, and leaves both files
+  byte-identical (checked twice in a row on rtk 0.50.0). Run before the symlinks exist, rtk would create its own real
+  `settings.json` and `CLAUDE.md`. If a later rtk rewrites either file in place, the write lands in the repository and
+  shows in `git diff`. If it writes atomically, it replaces the symlink and the guard refuses the next run. Either way,
+  the change becomes visible. `RTK.md` used to live in `claude/RTK.md` behind a symlink. The recipe deletes that link
+  before rtk runs, and `check` reports `link` if one remains. rtk resolves its target from `CLAUDE_CONFIG_DIR` in
+  preference to `$HOME/.claude`. The recipe runs `rtk telemetry disable` just before `rtk init`. On a machine with no
+  recorded answer, `init` would otherwise stop on an `Enable anonymous telemetry? [y/N]` prompt. The command also turns
+  telemetry back off if someone enabled it, which is intended.
 - `homebrew` target both installs Homebrew (if absent) **and** runs `brew bundle install` against
   `homebrew/Brewfile`. `Brewfile.lock.json` is written by Homebrew on bundle runs but is listed in `.gitignore` and
   deliberately not tracked.

@@ -7,17 +7,12 @@
 makefile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 makefile_directory := $(realpath $(dir $(makefile_path)))
 
-# Sandbox HOME used to regenerate the vendored RTK.md (see "rtk-sync")
-rtk_cache := ${HOME}/.cache/dotfiles/rtk-init
+# Third-party Claude skills installed globally by the skills CLI (see "skills")
+skills_cli := skills@1.7.0
+skills_mattpocock := grill-with-docs domain-modeling diagnosing-bugs grilling writing-for-agents wait-what
+skills_cursor := unslop
 
-# Upstream of the vendored Claude skills, kept verbatim (see "skills-sync")
-skills_repo := https://github.com/mattpocock/skills.git
-skills_cache := ${HOME}/.cache/dotfiles/mattpocock-skills
-skills_list := engineering/grill-with-docs engineering/domain-modeling \
-               engineering/diagnosing-bugs productivity/grilling \
-               productivity/writing-for-agents productivity/wait-what
-
-check: ## Verifies that every deployed symlink points back to this repository
+check: ## Verifies every deployed symlink, every third-party skill listed for "skills" and RTK.md
 	@status=0; \
 	verify() { \
 		if [ "$$(readlink "$$2" 2> /dev/null)" = "$$1" ]; then \
@@ -30,14 +25,35 @@ check: ## Verifies that every deployed symlink points back to this repository
 			printf "  \033[33mmiss\033[0m  %s\n" "$$2"; status=1; \
 		fi; \
 	}; \
+	verify_skill() { \
+		path="${HOME}/.claude/skills/$$2"; \
+		source="$$(jq -r --arg skill "$$2" '.skills[$$skill].source // empty' "${HOME}/.agents/.skill-lock.json" 2> /dev/null)"; \
+		if [ -L "$$path" ]; then \
+			printf "  \033[31mlink\033[0m  %s -> %s\n" "$$path" "$$(readlink "$$path")"; status=1; \
+		elif [ -f "$$path/SKILL.md" ] && [ "$$source" = "$$1" ]; then \
+			printf "  \033[32mok\033[0m    %s\n" "$$path"; \
+		elif [ -f "$$path/SKILL.md" ]; then \
+			printf "  \033[31mwrong\033[0m %s (locked source: %s)\n" "$$path" "$${source:-none}"; status=1; \
+		else \
+			printf "  \033[33mmiss\033[0m  %s\n" "$$path"; status=1; \
+		fi; \
+	}; \
 	verify "${makefile_directory}/claude/settings.json" "${HOME}/.claude/settings.json"; \
 	verify "${makefile_directory}/claude/statusline.py" "${HOME}/.claude/statusline.py"; \
 	verify "${makefile_directory}/claude/global.md" "${HOME}/.claude/CLAUDE.md"; \
-	verify "${makefile_directory}/claude/RTK.md" "${HOME}/.claude/RTK.md"; \
+	if [ -L "${HOME}/.claude/RTK.md" ]; then \
+		printf "  \033[31mlink\033[0m  %s -> %s\n" "${HOME}/.claude/RTK.md" "$$(readlink "${HOME}/.claude/RTK.md")"; status=1; \
+	elif [ -f "${HOME}/.claude/RTK.md" ]; then \
+		printf "  \033[32mok\033[0m    %s\n" "${HOME}/.claude/RTK.md"; \
+	else \
+		printf "  \033[33mmiss\033[0m  %s\n" "${HOME}/.claude/RTK.md"; status=1; \
+	fi; \
 	verify "${makefile_directory}/claude/hooks/command-history.sh" "${HOME}/.claude/hooks/command-history.sh"; \
 	for directory in ${makefile_directory}/claude/skills/*/; do \
 		verify "$${directory%/}" "${HOME}/.claude/skills/$$(basename $$directory)"; \
 	done; \
+	for skill in ${skills_mattpocock}; do verify_skill mattpocock/skills "$$skill"; done; \
+	for skill in ${skills_cursor}; do verify_skill cursor/plugins "$$skill"; done; \
 	verify "${makefile_directory}/git/.gitconfig" "${HOME}/.gitconfig"; \
 	verify "${makefile_directory}/git/.gitconfig-opensource" "${HOME}/.gitconfig-opensource"; \
 	verify "${makefile_directory}/git/.gitignore" "${HOME}/.gitignore"; \
@@ -55,12 +71,13 @@ check: ## Verifies that every deployed symlink points back to this repository
 	exit $$status
 .PHONY: check
 
-claude: ## Deploys the Claude configuration files
+claude: skills ## Deploys the Claude configuration files, the third-party skills and RTK.md
+	@command -v rtk > /dev/null || { echo "rtk is not installed"; exit 1; }
 	@# A real file where a symlink belongs means something wrote to ~/.claude outside this
 	@# repository. An in-place write follows the symlink and shows up as a diff here, but an
 	@# atomic one (temp file + rename) replaces the link instead, and "ln -sf" below would
 	@# discard it without ever surfacing it. Stop and let it be reviewed.
-	@targets="settings.json statusline.py CLAUDE.md RTK.md hooks/command-history.sh"; \
+	@targets="settings.json statusline.py CLAUDE.md hooks/command-history.sh"; \
 	for directory in ${makefile_directory}/claude/skills/*/; do \
 		targets="$$targets skills/$$(basename $$directory)"; \
 	done; \
@@ -75,13 +92,19 @@ claude: ## Deploys the Claude configuration files
 	ln -sf "${makefile_directory}/claude/settings.json" "${HOME}/.claude/settings.json"
 	ln -sf "${makefile_directory}/claude/statusline.py" "${HOME}/.claude/statusline.py"
 	ln -sf "${makefile_directory}/claude/global.md" "${HOME}/.claude/CLAUDE.md"
-	ln -sf "${makefile_directory}/claude/RTK.md" "${HOME}/.claude/RTK.md"
 	ln -sf "${makefile_directory}/claude/hooks/command-history.sh" "${HOME}/.claude/hooks/command-history.sh"
 	rm -f "${HOME}/.claude/hooks/rtk-rewrite.sh"
 	mkdir -p "${HOME}/.claude/skills"
 	for directory in ${makefile_directory}/claude/skills/*/; do \
 		ln -sfn "$${directory%/}" "${HOME}/.claude/skills/$$(basename $$directory)"; \
 	done
+	@# rtk writes RTK.md itself, after the symlinks, so that it finds its hook in settings.json and the "@RTK.md"
+	@# import in CLAUDE.md and leaves both files unchanged. RTK.md used to be a symlink into this repository, and rtk
+	@# must not write through it.
+	@[ -L "${HOME}/.claude/RTK.md" ] && rm -f "${HOME}/.claude/RTK.md"; true
+	@# Records the refusal up front, so "rtk init" never stops to ask for telemetry consent.
+	rtk telemetry disable > /dev/null
+	rtk init --global --auto-patch > /dev/null
 .PHONY: claude
 
 git: ## Deploys the Git configuration files
@@ -99,36 +122,19 @@ homebrew: ## Installs Homebrew and the latest version of its packages
 	brew bundle install --file="${makefile_directory}/homebrew/Brewfile" --verbose
 .PHONY: homebrew
 
-rtk-sync: ## Regenerates the vendored RTK.md from the installed rtk binary
-	@command -v rtk > /dev/null || { echo "rtk is not installed"; exit 1; }
-	@rm -rf "${rtk_cache}"
-	@mkdir -p "${rtk_cache}/.claude"
-	@# Sandboxed HOME: "rtk init --global" writes RTK.md, patches settings.json and adds the
-	@# "@RTK.md" import. Only RTK.md is vendored, so the rest is generated into the cache and
-	@# discarded rather than let loose on the live ~/.claude.
-	@# CLAUDE_CONFIG_DIR wins over $$HOME/.claude, so both are sandboxed.
-	@cd "${rtk_cache}" && HOME="${rtk_cache}" CLAUDE_CONFIG_DIR="${rtk_cache}/.claude" \
-		rtk init --global --auto-patch > /dev/null || { echo "rtk init failed"; exit 1; }
-	@cp "${rtk_cache}/.claude/RTK.md" "${makefile_directory}/claude/RTK.md"
-	@printf "Generated by rtk %s\n" "$$(rtk --version | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')"
-	@echo "Review before committing: git diff -- claude/RTK.md"
-.PHONY: rtk-sync
-
-skills-sync: ## Pulls the latest upstream version of the vendored Claude skills
-	@mkdir -p "$$(dirname ${skills_cache})"
-	@[ -d "${skills_cache}" ] || git clone --quiet --filter=blob:none --no-checkout "${skills_repo}" "${skills_cache}"
-	@git -C "${skills_cache}" fetch --quiet origin main
-	@paths=""; for skill in ${skills_list}; do paths="$$paths skills/$$skill"; done; \
-	git -C "${skills_cache}" checkout --quiet origin/main -- $$paths; \
-	for skill in ${skills_list}; do \
-		mkdir -p "${makefile_directory}/claude/skills/$$(basename $$skill)"; \
-		rsync --archive --delete --exclude="agents/" \
-			"${skills_cache}/skills/$$skill/" \
-			"${makefile_directory}/claude/skills/$$(basename $$skill)/"; \
-	done
-	@printf "Upstream revision: %s\n" "$$(git -C ${skills_cache} rev-parse --short origin/main)"
-	@echo "Review before committing: git diff -- claude/skills"
-.PHONY: skills-sync
+skills: ## Installs or updates the third-party Claude skills in ~/.claude/skills/
+	@command -v npx > /dev/null || { echo "npx is not installed"; exit 1; }
+	@# "claude" used to symlink these skills from claude/skills/. The CLI must not write through such a link once its
+	@# directory is gone. The loop deletes links only, never the real directories the CLI installs.
+	@for skill in ${skills_mattpocock}; do \
+		[ -L "${HOME}/.claude/skills/$$skill" ] && rm -f "${HOME}/.claude/skills/$$skill"; \
+	done; true
+	DISABLE_TELEMETRY=1 npx --yes ${skills_cli} add mattpocock/skills --global --agent claude-code --copy --yes \
+		$(addprefix --skill ,${skills_mattpocock})
+	DISABLE_TELEMETRY=1 npx --yes ${skills_cli} add cursor/plugins --global --agent claude-code --copy --yes \
+		$(addprefix --skill ,${skills_cursor})
+	sed -i '' '/^disable-model-invocation: true$$/d' "${HOME}/.claude/skills/unslop/SKILL.md"
+.PHONY: skills
 
 terminal: ## Deploys the configuration of the terminal
 	# Ghostty
