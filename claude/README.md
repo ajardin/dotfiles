@@ -181,7 +181,6 @@ repo by repo.
   the code as it evolves.
 - **`claude-security`** — multi-agent security scan of a repository. Verified findings come back as patch files to
   apply on demand rather than edits made in place.
-- **`code-review`** — PR reviews from the CLI without leaving the editor.
 - **`code-simplifier`** — second-pass cleanup after writing code; fights accumulated complexity.
 - **`context7`** — fetches up-to-date library docs. Compensates for training-data lag against recent framework
   versions.
