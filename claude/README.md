@@ -118,8 +118,7 @@ it has to work from a worktree or submodule, where `.git` is a file instead of a
 
 ## Skills (`skills/`)
 
-`make claude` symlinks every directory here into `~/.claude/skills/`, so a skill is available in every project without a
-per-repo install. Two kinds of skill end up in `~/.claude/skills/`, and this section is about the difference:
+Two kinds of skill end up in `~/.claude/skills/`, and both are available in every project without a per-repo install:
 
 - **Owned.** These are the directories in this folder, today `squad-env-branch`, `memory-curate`, `ship-draft` and
   `address-review`. The user writes and maintains them here, and `make claude` symlinks them.

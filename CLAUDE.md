@@ -71,25 +71,27 @@ the third-party skills from upstream's current version, without review. There is
   reviews an upstream change before it goes live; the user accepts that cost in exchange for installing from several
   repositories. `~/.agents/.skill-lock.json` records what each machine has (source, path, content hash), and git does
   not track it either. The CLI also copies each skill's Codex-only `agents/` folder, which Claude Code does not use. The
-  recipe sets `DISABLE_TELEMETRY=1` and pins the CLI version on purpose. Like rtk, the CLI resolves its target from
-  `CLAUDE_CONFIG_DIR` in preference to `$HOME/.claude`. Before installing, the recipe deletes any symlink in
-  `~/.claude/skills/` named after a skill that `claude/skills/` used to vendor, so the CLI never writes through a
-  dangling link. Drop that loop once no machine still has such a link. After installing, the recipe deletes the
-  `disable-model-invocation: true` line from `unslop`'s `SKILL.md`, so Claude can pick the skill on its own, as its
-  description ("Must always apply") intends. [cursor/plugins#379](https://github.com/cursor/plugins/pull/379) makes the
-  same change upstream. Once it merges, the `sed` line does nothing and can go.
-- `claude` target depends on `skills`, so one `make claude` deploys everything under `~/.claude/`. Its last step runs
-  `rtk init --global --auto-patch`, which writes `~/.claude/RTK.md` as a real file. Like the skills, that file is
-  upstream's current output, untracked and unreviewed. The recipe runs rtk after the symlinks on purpose. rtk then finds
-  its hook in `settings.json` and the `@RTK.md` import in `global.md`, reports both as present, and leaves both files
-  byte-identical (checked twice in a row on rtk 0.50.0). Run before the symlinks exist, rtk would create its own real
-  `settings.json` and `CLAUDE.md`. If a later rtk rewrites either file in place, the write lands in the repository and
-  shows in `git diff`. If it writes atomically, it replaces the symlink and the guard refuses the next run. Either way,
-  the change becomes visible. `RTK.md` used to live in `claude/RTK.md` behind a symlink. The recipe deletes that link
-  before rtk runs, and `check` reports `link` if one remains. rtk resolves its target from `CLAUDE_CONFIG_DIR` in
-  preference to `$HOME/.claude`. The recipe runs `rtk telemetry disable` just before `rtk init`. On a machine with no
-  recorded answer, `init` would otherwise stop on an `Enable anonymous telemetry? [y/N]` prompt. The command also turns
-  telemetry back off if someone enabled it, which is intended.
+  recipe sets `DISABLE_TELEMETRY=1` and pins the CLI version on purpose. Before installing, the recipe deletes every
+  dangling symlink in `~/.claude/skills/` that points into `claude/skills/`, left there by the skills this repository
+  used to vendor, so the CLI never writes through one. Drop that loop once no machine still has such a link. After
+  installing, the recipe deletes the `disable-model-invocation: true` line from `unslop`'s `SKILL.md`, so Claude can
+  pick the skill on its own, as its description ("Must always apply") intends.
+  [cursor/plugins#379](https://github.com/cursor/plugins/pull/379) makes the same change upstream. Once it merges, the
+  `sed` line does nothing and can go.
+- `claude` target depends on `claude-guard`, then `skills`, so one `make claude` deploys everything under `~/.claude/`.
+  `claude-guard` holds the rtk check and the symlink guard, so a run that is going to fail stops before the network
+  installs. Its last step runs `rtk init --global --auto-patch`, which writes `~/.claude/RTK.md` as a real file. Like
+  the skills, that file is upstream's current output, untracked and unreviewed. The recipe runs rtk after the symlinks
+  on purpose. rtk then finds its hook in `settings.json` and the `@RTK.md` import in `global.md`, reports both as
+  present, and leaves both files byte-identical (checked twice in a row on rtk 0.50.0). Run before the symlinks exist,
+  rtk would create its own real `settings.json` and `CLAUDE.md`. If a later rtk rewrites either file in place, the write
+  lands in the repository and shows in `git diff`. If it writes atomically, it replaces the symlink and the guard
+  refuses the next run. Either way, the change becomes visible. `RTK.md` used to live in `claude/RTK.md` behind a
+  symlink. The recipe deletes that link before rtk runs, and `check` reports `link` if one remains. rtk and the skills
+  CLI both resolve their target from `CLAUDE_CONFIG_DIR` in preference to `$HOME/.claude`. The recipe runs
+  `rtk telemetry disable` just before `rtk init`. On a machine with no recorded answer, `init` would otherwise stop on
+  an `Enable anonymous telemetry? [y/N]` prompt. The command also turns telemetry back off if someone enabled it, which
+  is intended.
 - `homebrew` target installs Homebrew if it is missing, and also runs `brew bundle install` against `homebrew/Brewfile`.
   Homebrew writes `Brewfile.lock.json` on bundle runs. `.gitignore` lists it on purpose, so git does not track it.
 - `terminal` target globs `terminal/fish/functions/*.fish`, so adding a new file there and running `make terminal` again
