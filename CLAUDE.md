@@ -35,9 +35,9 @@ the third-party skills from upstream's current version, without review. There is
   for others, since a PR description or a review comment follows its own audience. It also sets two standing bans: never
   run SQL directly, and never open a credential file. The credential ban names `Grep`, `Bash` and subagents too, because
   the `Read` deny rules in `settings.json` only bind one tool. Between the language rule and those bans, the file lists
-  four working rules: `Evidence before claims`, `Scope`, `Handoffs` and `Third-party facts`. Each comes from a logged
-  failure in the May to September 2026 usage reports. `claude/README.md` records which incident produced which rule, so
-  read it before reworking one.
+  five working rules: `Evidence before claims`, `Scope`, `Handoffs`, `Third-party facts` and `Shell quoting`. The first
+  four come from logged failures in the May to September 2026 usage reports, the fifth from a code review on 2026-10-01.
+  `claude/README.md` records which incident produced which rule, so read it before reworking one.
 - `claude` target refuses to run when any of its destinations in `~/.claude/` is a real file or directory instead of a
   symlink, and deploys nothing until someone removes it. The symlinks are how an outside edit becomes visible. A tool
   that writes `~/.claude/settings.json` in place follows the link into this repository, where `git diff` shows the

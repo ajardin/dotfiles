@@ -66,8 +66,8 @@ others, since a PR description or a review comment follows its own audience.
 `Database access` and `Credential files` are the two standing bans. They name `Grep`, `Bash` and subagents too, because
 the `permissions.deny` rules above only bind `Read`.
 
-The four rules in between came from the May to September 2026 usage reports across both machines, where *wrong approach*
-was the top friction category on each side. The incidents behind them are all on record:
+The first four rules in between came from the May to September 2026 usage reports across both machines, where *wrong
+approach* was the top friction category on each side. The incidents behind them are all on record:
 
 - **`Evidence before claims`.** The recurring failure is stating a conclusion from partial evidence. Claude flagged a
   Ghostty config as "never loaded" and had to retract the finding. It proposed a config line that was already the tool's
@@ -82,6 +82,12 @@ was the top friction category on each side. The incidents behind them are all on
   discarded every one once real screenshots arrived. `context7` covers library docs, not product UIs, so this rule
   covers that gap. It is written against any external service's vocabulary, not that one incident's field names, so it
   applies to an unfamiliar API or CLI too.
+
+The fifth rule, `Shell quoting`, came from a code review on 2026-10-01 rather than from the usage reports.
+`squad-env-branch` merged with `git merge -m "Merge PR #N: <title> …"`, so a squad member's PR title reached the shell
+inside double quotes, and `ship-draft` passed its PR title to `gh pr create --title "…"` the same way. A title such as
+``Fix `touch pwned` race $(touch pwned2)`` would have run both commands. Both skills now go through a quoted heredoc.
+The rule states the principle once, so a new skill or an ad hoc `gh … --body` call does not repeat the mistake.
 
 ## `statusline.py`
 

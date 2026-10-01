@@ -37,6 +37,12 @@ Look up an external service's own vocabulary in a screenshot I give you, a fetch
 it from memory. If none of those is available, name what you need and build the rest of the deliverable around that gap
 instead of filling it in.
 
+# Shell quoting
+
+Text you did not write, or that holds a backtick or a `$`, reaches the shell through a file or a quoted heredoc
+(`-F`, `--body-file`, `<<'EOF'`), never inside double quotes. A PR title, a commit subject or a review comment can then
+contain `$(…)` without running it.
+
 # Database access
 
 Never run SQL yourself. This includes the PhpStorm MCP database tools (`execute_sql_query`, `preview_table_data`,
