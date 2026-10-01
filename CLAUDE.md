@@ -23,6 +23,9 @@ make terminal    # symlink Ghostty config, fish config and functions, and Starsh
 Targets are idempotent. Running one again re-creates its symlinks. `make claude` also runs `skills`, which reinstalls
 the third-party skills from upstream's current version, without review. There is no test suite, linter or CI.
 
+Verify a `Makefile` change with `make -n <target>` and `make check`. Try anything that runs `rtk init` or `npx skills`
+under a throwaway `HOME` and `CLAUDE_CONFIG_DIR` first, with `DISABLE_TELEMETRY=1`.
+
 ## Deployment model and gotchas
 
 - `git` target creates `~/.gitconfig-corporate` as an empty file with `touch`, on purpose. `git/.gitconfig` always
@@ -103,6 +106,8 @@ the third-party skills from upstream's current version, without review. There is
   first place. It is the one thing to change on an Intel Mac, where the prefix is `/usr/local/…`. In `config.fish`, only
   the Starship prompt sits inside `status is-interactive`. The environment variables and `PATH` stay outside it, because
   fish scripts need them too.
+- Claude cannot run `make skills` or `make claude` in auto mode: both remove `unslop`'s `disable-model-invocation`
+  line, which the classifier blocks as self-modification. Ask the user to run them.
 
 ## Claude Code integration
 
@@ -141,7 +146,10 @@ why RTK, why each plugin. Read it before changing anything under `claude/`, and 
   adding entries.
 - Fish functions in `terminal/fish/functions/` follow the one-function-per-file convention that fish's autoloader
   requires; the filename must match the function name.
-- Every Markdown file wraps at 120 columns.
+- Every Markdown file wraps at 120 characters, not bytes: `awk length` counts `…` and `·` as several. Never break a
+  line inside a `code span`, so a grep still finds it.
+- Prose follows `unslop`: no em dashes, no colon joining two sentences, no `**Label**:` lead-ins (end the label with a
+  period). The one em dash kept on purpose is the `- [Title](file.md) — hook` memory index format in `memory-curate`.
 - Commit messages are a single imperative sentence in sentence case, with no body and no prefix or scope tag ("Vendor
   upstream Claude skills and add a sync target"). Add no attribution trailer. `attribution` in `settings.json` is empty
   on purpose, so strip any `Co-Authored-By` or session footer a tool tries to append.
