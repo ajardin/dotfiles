@@ -50,8 +50,17 @@ already the go-ahead. The draft itself is the review step, so publish without a 
      migration checked). Leave the rest unticked, and leave the items addressed to other roles
      (code owner, reviewer) to them.
    - Write the file to the scratchpad.
-6. **Open.** `gh pr create --draft --base <base> --title "<title>" --body-file <file>`, with a
-   title that follows the recent PR titles, or the commit subject when there are none.
+6. **Open.** Pick a title that follows the recent PR titles, or the commit subject when there are
+   none, and pass it through a quoted heredoc rather than straight into double quotes, where the
+   shell would run any `$(…)` or backtick in it:
+
+   ```bash
+   TITLE="$(cat <<'TITLE'
+   <title>
+   TITLE
+   )"
+   gh pr create --draft --base <base> --title "$TITLE" --body-file <file>
+   ```
 7. **Verify.** Straight away, run `gh pr view <n> --json body -q .body > <scratchpad>/check.md`
    and diff it against the file. Keep `check.md` in the scratchpad, never in the repository, where
    step 2 of the next run would commit it. The only difference allowed is the final newline. If more differs, the
