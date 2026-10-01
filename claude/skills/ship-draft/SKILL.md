@@ -52,8 +52,9 @@ already the go-ahead. The draft itself is the review step, so publish without a 
    - Write the file to the scratchpad.
 6. **Open.** `gh pr create --draft --base <base> --title "<title>" --body-file <file>`, with a
    title that follows the recent PR titles, or the commit subject when there are none.
-7. **Verify.** Straight away, run `gh pr view <n> --json body -q .body > check.md` and diff it
-   against the file. The only difference allowed is the final newline. If more differs, the
+7. **Verify.** Straight away, run `gh pr view <n> --json body -q .body > <scratchpad>/check.md`
+   and diff it against the file. Keep `check.md` in the scratchpad, never in the repository, where
+   step 2 of the next run would commit it. The only difference allowed is the final newline. If more differs, the
    body was truncated, so publish it again with `gh pr edit <n> --body-file <file>` and diff again.
 
 Done when the PR URL is returned and step 7's diff is clean. Close with the URL, the branch, the
