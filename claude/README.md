@@ -51,8 +51,6 @@ The four keys below record what they do, not why. Add the rationale the next tim
 
 - **`attribution: { commit: "", pr: "" }`.** Removes the "Generated with Claude Code" footers from commits and PRs. The
   human is the author, not the tool.
-- **`outputStyle: "Concise"`.** Answers lead with the result and drop preamble, narration and closing recaps. This
-  records what it does; the rationale is still missing.
 
 ## `global.md`
 
