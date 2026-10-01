@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Claude Code PostToolUse hook — logs every executed Bash command to a daily
+# Claude Code PostToolUse hook. Logs every executed Bash command to a daily
 # JSONL file (~/.claude/command-history/YYYY-MM-DD.jsonl) for behavior analysis.
 #
 # Each line: {"ts", "session", "cwd", "command"}
-# Note: commands are captured AFTER the RTK PreToolUse rewrite, i.e. as they
-# were actually executed.
+# The hook records each command after the RTK PreToolUse rewrite, which is the
+# command that actually ran.
 #
-# Old files are pruned on the "cleanupPeriodDays" window from settings.json (see below).
+# It prunes old files on the "cleanupPeriodDays" window from settings.json (see below).
 #
-# This hook must never disturb the session: it always exits 0, even on failure.
+# This hook must never disturb the session, so it always exits 0, even on failure.
 
 command -v jq &>/dev/null || exit 0
 
@@ -31,10 +31,10 @@ echo "$INPUT" | jq -c \
     command: .tool_input.command
   }' >> "${HISTORY_DIR}/$(date +%F).jsonl" 2>/dev/null
 
-# Retention: same window as the transcripts, read from "cleanupPeriodDays" in settings.json so
-# there is one number to change rather than two. Falls back to 90 if the key is absent or not a
-# plain integer. This hook runs on every Bash call, so the prune is throttled to once a day; the
-# stamp is written first, meaning a failed prune waits for tomorrow instead of retrying in a loop.
+# Retention uses the same window as the transcripts. The hook reads "cleanupPeriodDays" from
+# settings.json, so there is one number to change instead of two, and falls back to 90 if the key
+# is absent or not a plain integer. It runs on every Bash call, so it prunes at most once a day. It
+# writes the stamp first, so a failed prune waits for tomorrow instead of retrying in a loop.
 STAMP="${HISTORY_DIR}/.last-prune"
 TODAY=$(date +%F)
 if [ "$(cat "$STAMP" 2>/dev/null)" != "$TODAY" ]; then

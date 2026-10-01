@@ -77,7 +77,7 @@ claude: skills ## Deploys the Claude configuration files, the third-party skills
 	@# A real file where a symlink belongs means something wrote to ~/.claude outside this
 	@# repository. An in-place write follows the symlink and shows up as a diff here, but an
 	@# atomic one (temp file + rename) replaces the link instead, and "ln -sf" below would
-	@# discard it without ever surfacing it. Stop and let it be reviewed.
+	@# discard it before anyone sees it. Stop so that someone reviews it first.
 	@targets="settings.json statusline.py CLAUDE.md hooks/command-history.sh"; \
 	for directory in ${makefile_directory}/claude/skills/*/; do \
 		targets="$$targets skills/$$(basename $$directory)"; \
@@ -85,7 +85,7 @@ claude: skills ## Deploys the Claude configuration files, the third-party skills
 	for target in $$targets; do \
 		path="${HOME}/.claude/$$target"; \
 		if [ -e "$$path" ] && [ ! -L "$$path" ]; then \
-			printf "  \033[31mrefusing\033[0m %s is not a symlink — review it, then remove it\n" "$$path"; \
+			printf "  \033[31mrefusing\033[0m %s is not a symlink. Review it, then remove it\n" "$$path"; \
 			exit 1; \
 		fi; \
 	done

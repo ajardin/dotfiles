@@ -1,9 +1,6 @@
-# My Dotfiles
+# My dotfiles
 
-The easiest way to use the content of this repository is to clone it on your local machine (e.g. `~/.dotfiles`), and
-then run the various setup scripts provided by the `Makefile`. :wink:
+Clone this repository on your machine, for example to `~/.dotfiles`. To use the same configuration as me, run the
+`Makefile` targets you need (`make help` lists them). Otherwise, copy the files you want.
 
-> Keep in mind that these are my personal settings. You should check that they suit your needs.
-
-:point_right: If you want to use the same configuration as me, you can use the `Makefile` targets. Otherwise, you can
-copy the files you want.
+> These are my personal settings. Check that they suit your needs before you use them.

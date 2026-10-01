@@ -3,7 +3,7 @@
 
 Reads the status-line JSON payload from stdin and prints one line:
 model, effort level, context usage, rate-limit gauges, git branch.
-Any failure degrades to a minimal fallback — the status line must never crash.
+Any failure falls back to a minimal line, because the status line must never crash.
 """
 
 from __future__ import annotations
@@ -23,8 +23,8 @@ DIM = "\033[2m"
 SEP = f" {DIM}·{RESET} "
 
 BAR_LENGTH = 10
-# Usage thresholds, in percent, so they hold whatever the context window. Shared by the
-# context bar and the rate-limit gauges: for both, a higher percentage is worse.
+# Usage thresholds in percent, so they work for any context window size. The context bar
+# and the rate-limit gauges share them, and for both a higher percentage is worse.
 WARN_PCT = 60
 DANGER_PCT = 80
 
@@ -112,9 +112,9 @@ def gauge(label: str, window: dict) -> str | None:
         return None
     resets_at = window.get("resets_at")
     remaining = resets_at - time.time() if resets_at else None
-    # Past its reset the window has restarted, but the payload keeps serving the
-    # pre-reset figure until an API response refreshes it — flag it rather than
-    # colour a number we know is wrong.
+    # Past its reset the window has restarted, but the payload keeps the pre-reset
+    # figure until an API response refreshes it. Flag it instead of colouring a
+    # number we know is wrong.
     stale = remaining is not None and remaining <= 0
     c = DIM if stale else usage_color(pct)
     s = f"{DIM}{label}{RESET} {c}{bar(pct)} {pct:.0f}%{RESET}"
@@ -126,7 +126,7 @@ def gauge(label: str, window: dict) -> str | None:
 
 
 def model_name(data: dict) -> str:
-    """Model label, resilient to a null 'model' or 'display_name' — also the crash fallback."""
+    """Model label, safe with a null 'model' or 'display_name'. Also the crash fallback."""
     return (data.get("model") or {}).get("display_name") or "Claude"
 
 
@@ -146,7 +146,7 @@ def context_segment(data: dict) -> str | None:
     c = usage_color(pct)
     seg = f"Context: {c}{bar(pct)} {pct:d}%{RESET}"
     if used:
-        # No assumed window: a guessed total would contradict the percentage beside it.
+        # Do not assume a window, because a guessed total would contradict the percentage beside it.
         raw = f"{fmt_tokens(used)}/{fmt_tokens(total)}" if total else fmt_tokens(used)
         seg += f" {DIM}{raw}{RESET}"
     return seg
@@ -166,9 +166,9 @@ def branch_segment(data: dict) -> str | None:
 def build_status(data: dict) -> str:
     parts = [model_name(data)]
 
-    # Guarded one by one: a malformed field costs its own segment, never the whole line.
-    # Without this, something like a non-numeric "resets_at" would drop the context bar and
-    # the branch too, leaving the model name alone.
+    # Each segment has its own guard, so a malformed field costs only its own segment.
+    # Without this, a non-numeric "resets_at" would also drop the context bar and the
+    # branch, leaving the model name alone.
     for segment in (effort_segment, context_segment, rate_limit_segments, branch_segment):
         try:
             value = segment(data)
@@ -183,7 +183,7 @@ def build_status(data: dict) -> str:
 
 
 def main() -> None:
-    # Broad excepts are deliberate: a status line must always print something.
+    # The broad excepts are on purpose, because a status line must always print something.
     try:
         data = json.load(sys.stdin)
     except Exception:

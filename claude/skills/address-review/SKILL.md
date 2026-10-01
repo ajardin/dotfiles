@@ -4,11 +4,11 @@ description: Address the review comments on a pull request: collect the unresolv
 argument-hint: "[PR number | PR URL | discussion URL] [extra instructions]"
 ---
 
-# Address Review
+# Address review
 
 Turn a reviewer's threads into changes, point by point, with the user deciding at every
-**gate**. GitHub is the user's voice: the skill writes reply drafts, and only the user publishes
-them. The one write this skill makes on GitHub is resolving the threads the user names.
+gate. Replies on GitHub come from the user alone. The skill writes reply drafts, and only the user
+publishes them. The one write this skill makes on GitHub is resolving the threads the user names.
 
 ## Scope
 
@@ -28,21 +28,21 @@ them. The one write this skill makes on GitHub is resolving the threads the user
    scope is accounted for.
 2. **Triage.** For each point, read the code it targets, as it is now (a thread marked outdated
    may already be handled). Present one table: `#`, author, `file:line`, the request in one line,
-   your **verdict** (agree / partly / disagree), the evidence (`file:line` and an excerpt, or the
-   project rule it relies on), and the **cost** (trivial / needs a decision). Give options for
-   every point marked "needs a decision". Done when every collected point is a row. Then stop:
-   this is the first gate.
+   your verdict (agree / partly / disagree), the evidence (`file:line` and an excerpt, or the
+   project rule it relies on), and the cost (trivial / needs a decision). Give options for
+   every point marked "needs a decision". Done when every collected point is a row. Then stop.
+   This is the first gate.
 3. **Implement** every point the user picks, in the order given. Once all of them are in, run the
    tests covering the code they touch, a single run for the whole batch. Report the diff point by
    point, then the test outcome. Then stop at the gate. Commit, push and resolve each wait for the
    user's word, as follows:
-   - **Commit**: one commit per point, in the style of `git log --oneline -15`, or an amend
+   - **Commit.** One commit per point, in the style of `git log --oneline -15`, or an amend
      into the previous commit when asked. Stage each point on its own: whole files, or a hunk
      patch through `git apply --cached` when two points share a file. Points whose hunks
      overlap go in one commit, named as such.
-   - **Push**: `git push`. Force-push only after an amend the user asked for, with
+   - **Push.** Run `git push`. Force-push only after an amend the user asked for, with
      `--force-with-lease`.
-   - **Resolve**: `resolveReviewThread(input: {threadId})` on the threads the user names, and
+   - **Resolve.** Call `resolveReviewThread(input: {threadId})` on the threads the user names, and
      only after the push that carries the fix.
 4. **Draft replies** for the points the user will answer themselves (a disagreement, a
    decision, a question back). Write them to the scratchpad, one section per thread, headed by

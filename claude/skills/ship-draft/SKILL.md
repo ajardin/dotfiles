@@ -4,25 +4,25 @@ description: Ship the current work as a draft pull request: branch if needed, co
 argument-hint: "[--base <branch>] [ticket key or URL] [extra instructions]"
 ---
 
-# Ship Draft
+# Ship draft
 
 Take the work in the current checkout to an open **draft** PR in one pass. A request to ship is
-already the go-ahead: the draft itself is the review step, so publish without a preview round.
+already the go-ahead. The draft itself is the review step, so publish without a preview round.
 
 ## Inputs
 
-- **Base**: `--base <branch>` from `$ARGUMENTS`, otherwise the repository's default branch
+- **Base.** `--base <branch>` from `$ARGUMENTS`, otherwise the repository's default branch
   (`gh repo view --json defaultBranchRef -q .defaultBranchRef.name`).
-- **Conventions**: read them from the repository, never from memory:
+- **Conventions.** Read them from the repository, never from memory:
   - commit style: `git log --oneline -15`
   - PR titles, description language, ticket links:
     `gh pr list --author @me --state all --limit 5 --json title,body`
   - With no PR history yet, the commit log sets the style and the language.
-- **Ticket**: a key or URL in `$ARGUMENTS` or in the conversation, otherwise a key in the branch
-  name — but only when the recent PR bodies show the repository links tickets (Jira, GitHub
+- **Ticket.** A key or URL in `$ARGUMENTS` or in the conversation, otherwise a key in the branch
+  name, but only when the recent PR bodies show that the repository links tickets (Jira, GitHub
   issues…). Link it the way those PRs do, as a full URL; with no ticket, there is no ticket
   section.
-- **Template**: the first that exists of `.github/pull_request_template.md`,
+- **Template.** The first that exists of `.github/pull_request_template.md`,
   `pull_request_template.md`, `docs/pull_request_template.md`. With several templates under
   `.github/PULL_REQUEST_TEMPLATE/`, pick the one matching the change, and ask when none clearly
   does. With no template, use: summary, changes, testing, ticket.
@@ -38,7 +38,7 @@ already the go-ahead: the draft itself is the review step, so publish without a 
    belong to something else, list them and ask before going on. One commit per logical change,
    in the style of the log, no trailer. Done when `git status --short` shows nothing of this task.
 3. **Check for an existing PR.** Run `gh pr list --head <branch> --json number,url`. If one
-   exists, push, report its URL and stop there: its description belongs to whoever edited it
+   exists, push, report its URL and stop there. Its description belongs to whoever edited it
    last, so leave it as it is.
 4. **Push.** `git push -u origin <branch>`.
 5. **Write the body.** Fill the template section by section, in the language of the recent PRs:
@@ -54,7 +54,7 @@ already the go-ahead: the draft itself is the review step, so publish without a 
    title that follows the recent PR titles, or the commit subject when there are none.
 7. **Verify.** Straight away, run `gh pr view <n> --json body -q .body > check.md` and diff it
    against the file. The only difference allowed is the final newline. If more differs, the
-   body was truncated: re-publish it with `gh pr edit <n> --body-file <file>` and diff again.
+   body was truncated, so publish it again with `gh pr edit <n> --body-file <file>` and diff again.
 
 Done when the PR URL is returned and step 7's diff is clean. Close with the URL, the branch, the
 commits, and any section of the template left empty with the reason.
