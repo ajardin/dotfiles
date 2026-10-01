@@ -14,8 +14,10 @@ README explains why each choice was made, not only what it does.
   per-machine session state.
 - **`advisorModel: "fable"`.** The `advisor` tool runs on Fable instead of the session model, so reviews come from a
   second model, not the one that wrote the code.
-- **`effortLevel: "high"`.** Reasoning budget per turn. It ran at `xhigh` for a while after the switch back to Opus,
-  then went back to `high`, because the extra budget did not pay off on day-to-day work.
+- **`modelSettings`.** Sets the reasoning budget per model: `effortLevel: "high"` for `claude-opus-5-5` and
+  `effortLevel: "medium"` for `claude-fable-5-1`. The single `effortLevel` it replaced ran at `xhigh` for a while after
+  the switch back to Opus, then went back to `high`, because the extra budget did not pay off on day-to-day work. The
+  reason for `medium` on Fable is not recorded yet; add it the next time you change this key.
 - **`alwaysThinkingEnabled: true`.** Extended thinking is on by default. This favors reasoning quality over latency,
   which suits the multi-step engineering work this setup is for.
 - **`autoUpdatesChannel: "latest"`.** The setup accepts some churn in exchange for new features as soon as they ship.
