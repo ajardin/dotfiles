@@ -166,8 +166,14 @@ For a PR `#N` titled `<title>`, authored by `@<author>`:
 
 ```bash
 git fetch origin "pull/N/head"                 # PR head, fork-safe, no local ref
-git merge --no-ff -m "Merge PR #N: <title> (@<author>)" FETCH_HEAD
+git merge --no-ff -F /dev/stdin FETCH_HEAD <<'MSG'
+Merge PR #N: <title> (@<author>)
+MSG
 ```
+
+Another person wrote the title, so never put it inside double quotes: the shell would run any
+`$(…)` or backtick in it. The quoted `'MSG'` delimiter passes it through untouched. `git merge`
+does not accept `-F -`, hence `/dev/stdin`.
 
 Read the merge result:
 
