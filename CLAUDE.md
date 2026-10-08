@@ -106,6 +106,11 @@ under a throwaway `HOME` and `CLAUDE_CONFIG_DIR` first, with `DISABLE_TELEMETRY=
   first place. It is the one thing to change on an Intel Mac, where the prefix is `/usr/local/…`. In `config.fish`, only
   the Starship prompt sits inside `status is-interactive`. The environment variables and `PATH` stay outside it, because
   fish scripts need them too.
+- `config.fish` ends by moving cmux's shim directory (`$CMUX_CLAUDE_WRAPPER_SHIM_ROOT`) back to the front of `PATH`.
+  `brew shellenv` runs `fish_add_path --move`, which would otherwise put `/opt/homebrew/bin/claude` ahead of the shim,
+  and cmux's wrapper would never inject its Claude Code hooks. cmux's own Fish integration, which would fix `PATH`
+  itself, does not load here, apparently because the login shell is zsh and Ghostty's `command` starts Fish. Keep that
+  block last in the file.
 - Claude cannot run `make skills` or `make claude` in auto mode: both remove `unslop`'s `disable-model-invocation`
   line, which the classifier blocks as self-modification. Ask the user to run them.
 

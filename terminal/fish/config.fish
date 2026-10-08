@@ -24,3 +24,10 @@ if not string match -q -- $PNPM_HOME $PATH
   set -gx PATH "$PNPM_HOME" $PATH
 end
 # pnpm end
+
+# cmux
+# `brew shellenv` and the prepends above put their directories in front of the cmux shim, which routes `claude` through
+# the wrapper that injects cmux's Claude Code hooks (notifications, sidebar status). Put the shim back in front.
+if set -q CMUX_CLAUDE_WRAPPER_SHIM_ROOT
+    fish_add_path --global --move --path $CMUX_CLAUDE_WRAPPER_SHIM_ROOT
+end
