@@ -79,10 +79,10 @@ cask "aws-vpn-client"
 cask "claude"
 # Terminal-based AI coding assistant
 cask "claude-code@latest"
+# Ghostty-based terminal with vertical tabs and notifications for AI coding agents
+cask "cmux"
 # A typeface made for developers by JetBrains
 cask "font-jetbrains-mono"
-# Terminal emulator that uses platform-native UI and GPU acceleration
-cask "ghostty"
 # Tools to protect your emails and files
 cask "gpg-suite"
 # JetBrains tools manager
