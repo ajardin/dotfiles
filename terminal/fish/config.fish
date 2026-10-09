@@ -31,3 +31,7 @@ end
 if set -q CMUX_CLAUDE_WRAPPER_SHIM_ROOT
     fish_add_path --global --move --path $CMUX_CLAUDE_WRAPPER_SHIM_ROOT
 end
+
+# Added by OrbStack: command-line tools and integration
+# This won't be added again if you remove it.
+source ~/.orbstack/shell/init2.fish 2>/dev/null || :
